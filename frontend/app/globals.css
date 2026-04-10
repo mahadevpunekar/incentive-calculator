@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dhofar logo — wordmark / ring #622d50, green #009946, gold #ab6c10 */
+    --brand-plum: 325 37% 28%;
+    --brand-green: 152 100% 30%;
+    --brand-gold: 32 83% 37%;
+
+    /* Main canvas: neutral type (pre-plum enterprise look) */
+    --background: 210 20% 98%;
+    --foreground: 222.2 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47% 11%;
+    --primary: var(--brand-plum);
+    --primary-foreground: 0 0% 99%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: var(--brand-plum);
+    --radius: 0.625rem;
+    /* Shell (sidebar + topbar): logo plum family */
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 325 30% 16%;
+    --sidebar-border: 325 12% 91%;
+    --sidebar-accent: 325 26% 96%;
+    --sidebar-accent-foreground: 325 35% 20%;
+    --sidebar-muted-foreground: 325 10% 40%;
+    /* Warnings / accelerator UI (same hue family as logo gold) */
+    --brand-amber: var(--brand-gold);
+  }
+
+  .dark {
+    --background: 222.2 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 47% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 47% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 325 32% 58%;
+    --primary-foreground: 325 40% 8%;
+    --secondary: 217 19% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 19% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 19% 18%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217 19% 20%;
+    --input: 217 19% 20%;
+    --ring: 325 32% 58%;
+    --sidebar: 325 14% 8%;
+    --sidebar-foreground: 325 10% 96%;
+    --sidebar-border: 325 10% 16%;
+    --sidebar-accent: 325 14% 14%;
+    --sidebar-accent-foreground: 325 10% 96%;
+    --sidebar-muted-foreground: 325 8% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    min-height: 100%;
+  }
+}
+
+/* Viewport-locked app shell: stable height without relying on Tailwind dvh utilities */
+@layer components {
+  .app-shell {
+    height: 100vh;
+    max-height: 100vh;
+  }
+  @supports (height: 100dvh) {
+    .app-shell {
+      height: 100dvh;
+      max-height: 100dvh;
+    }
+  }
+}

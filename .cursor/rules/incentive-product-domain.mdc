@@ -1,0 +1,50 @@
+---
+description: Incentive Calculator — full product module map and core components
+alwaysApply: true
+---
+
+# Incentive Calculator — Product Domain
+
+Implement features and mocks against this module map. Preserve role semantics (Sales → self, Manager → team, Admin → org).
+
+## 1. Dashboard (Executive Overview)
+- KPIs: total incentive earned; target vs achieved; achievement %; pending vs paid
+- Visuals: monthly/quarterly trends; revenue vs incentive
+- Insights: over/under performance flags; optional AI suggestions
+- Activity: recent deals; incentive updates
+
+## 2. Incentive Calculator Engine (Core Logic)
+- Inputs: revenue/sales value; deals closed; configurable KPI inputs
+- Rules: slab/tier incentives; role/seasonal multipliers; accelerators (overachievement)
+- Engine: real-time payout; retroactive adjustments; what-if simulation; historical plan versions
+
+## 3. Performance Tracking
+- Individual: sales vs targets; conversion; deal velocity
+- Team: team vs individual; weekly/monthly/quarterly time intelligence
+- Drill-down: user → deal → KPI; alerts on drops and goals nearing
+
+## 4. Leaderboard & Gamification
+- Rankings: revenue, incentive, KPI score; filters (period, region/team)
+- Gamification: badges; rank movement (↑↓); optional rewards/points
+
+## 5. Incentive Breakdown Engine
+- Split: base, variable, bonus/accelerator; drill-down by deal, KPI, time
+- Audit: calculation logs; rules applied; export Excel/PDF
+
+## 6. Scenario Simulation (Advanced)
+- Scenario builder (e.g. “close N more deals”); current vs projected; sensitivity on KPIs; side-by-side views; forecast charts
+
+## 7. Reporting & Analytics
+- Reports: summary, detailed breakdown, leaderboard; scheduling; Excel/PDF/CSV; historical trends; compliance-oriented outputs
+
+## 8. Targets & Goals Management
+- Setup: revenue and KPI targets; individual vs team allocation; completion %; nearing/missed alerts; optional dynamic adjustment
+
+## 9. Admin & Configuration
+- Plan builder: slabs, tiers, multipliers; KPI weights; user roles; plan assignment by role/team; approval workflows before payout
+
+## 10. Data Integration Layer
+- CRM: Salesforce, HubSpot; Excel/CSV import; API sync; batch jobs; validation, errors, deduplication
+
+## 11. User Profile & Settings
+- Profile, assigned targets, plans; RBAC; notifications (email, in-app)

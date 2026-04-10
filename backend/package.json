@@ -1,0 +1,6 @@
+{
+  "name": "@ic/backend",
+  "version": "0.0.0",
+  "private": true,
+  "description": "API placeholder — NestJS service will live here. Not used by the current frontend."
+}

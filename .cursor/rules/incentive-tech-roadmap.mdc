@@ -1,0 +1,30 @@
+---
+description: Stack, monorepo plan, and frontend-first prototype boundaries
+alwaysApply: true
+---
+
+# Tech Stack & Delivery Phases
+
+## Repository layout
+- **`frontend/`** — Next.js App Router app (active). Run `npm run dev` from repo root.
+- **`backend/`** — placeholder for future **NestJS** API.
+
+## Target architecture (later)
+- Monorepo: **NestJS** in `backend/`, **Next.js** in `frontend/`, **PostgreSQL** (data).
+- Keep domain concepts (plans, slabs, payouts, roles) portable so the NestJS layer can own persistence and rules without rewriting product semantics.
+
+## Current phase — frontend prototype first
+- Ship a **complete UI prototype** in React + Tailwind with **mock data** and **client-side** calculation demos where needed.
+- Do **not** block the prototype on backend or DB; use fixtures, MSW, or in-memory modules that mirror future API shapes.
+- Name and structure API client boundaries (e.g. `services/`, `api/types`) so swapping mocks for real NestJS endpoints is mechanical later.
+
+## Prototype prioritization (suggested order)
+1. Dashboard + role-based views (mock user context).
+2. Calculator + breakdown (transparent line items; audit-style copy in UI even if logs are mocked).
+3. Performance + leaderboard (tables/charts from mock series).
+4. Targets, reporting exports (client-generated CSV/PDF or placeholders), admin/plan builder shells as needed for demos.
+
+## Cross-cutting rules for agents
+- Match **RBAC** in routing and component visibility from day one.
+- Prefer **accessible**, responsive layouts; reuse tokens/utilities consistently (Tailwind).
+- Optional features (AI insights, CRM sync, rewards) stay behind clear flags or “coming soon” sections without fake integrations unless explicitly requested.
