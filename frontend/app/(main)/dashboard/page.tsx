@@ -1,4 +1,7 @@
+import { Suspense } from "react";
+
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { PageShellSkeleton } from "@/components/skeletons/page-shell-skeleton";
 import { api } from "@/lib/mock-api/client";
 
 export default async function DashboardPage() {
@@ -21,14 +24,16 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <DashboardShell
-      kpis={kpis}
-      accrualBuckets={accrualBuckets}
-      payoutCurve={payoutCurve}
-      alerts={alerts}
-      exposures={exposures}
-      trend={trend}
-      monthly={monthly}
-    />
+    <Suspense fallback={<PageShellSkeleton />}>
+      <DashboardShell
+        kpis={kpis}
+        accrualBuckets={accrualBuckets}
+        payoutCurve={payoutCurve}
+        alerts={alerts}
+        exposures={exposures}
+        trend={trend}
+        monthly={monthly}
+      />
+    </Suspense>
   );
 }

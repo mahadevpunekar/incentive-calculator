@@ -47,11 +47,14 @@ export function sliceMatches(
   return true;
 }
 
-export function filterDimensional<T extends { slice: DataSliceDimensions }>(
+export function filterDimensional<T extends { slice?: DataSliceDimensions }>(
   rows: T[],
   f: GlobalFilterState,
   activeKeys?: ReadonlySet<FilterDimension> | null
 ): T[] {
   if (activeKeys === null) return rows;
-  return rows.filter((r) => sliceMatches(r.slice, f, activeKeys));
+  return rows.filter((r) => {
+    if (r.slice == null) return false;
+    return sliceMatches(r.slice, f, activeKeys);
+  });
 }

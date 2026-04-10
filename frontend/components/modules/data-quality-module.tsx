@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type { DataQualityIssue } from "@/lib/mock-api/types";
 

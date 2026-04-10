@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type { IntegrationLogEntry } from "@/lib/mock-api/types";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 
 function levelVariant(
   level: IntegrationLogEntry["level"]

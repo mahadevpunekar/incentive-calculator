@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type { PerformanceSignalRow } from "@/lib/mock-api/types";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 
 export function PerformanceSignalsCard({
   signals,

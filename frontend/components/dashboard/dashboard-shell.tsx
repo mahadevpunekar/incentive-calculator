@@ -17,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import { deriveKpisForFilters } from "@/lib/dashboard-derive-kpis";
 import type {

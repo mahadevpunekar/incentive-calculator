@@ -14,7 +14,7 @@ import {
 import { DataTable, type Column } from "@/components/data-table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type {
   BrokerPerformanceRow,
