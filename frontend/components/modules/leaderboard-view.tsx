@@ -6,7 +6,7 @@ import { DataTable, type Column } from "@/components/data-table";
 import { StatBadge } from "@/components/stat-badge";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type { LeaderboardRow } from "@/lib/mock-api/types";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 
 const columns: Column<LeaderboardRow>[] = [
   {

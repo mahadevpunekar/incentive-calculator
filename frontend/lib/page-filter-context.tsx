@@ -11,14 +11,8 @@ import { useGlobalFilterStore } from "@/stores/global-filter-store";
  */
 export function usePageFilterContext() {
   const pathname = usePathname() ?? "";
-  const policy = useMemo(
-    () => getPageFilterPolicy(pathname),
-    [pathname]
-  );
-  const activeKeys = useMemo(
-    () => filterKeySet(policy),
-    [policy]
-  );
+  const policy = useMemo(() => getPageFilterPolicy(pathname), [pathname]);
+  const activeKeys = useMemo(() => filterKeySet(policy), [policy]);
   const filters = useGlobalFilterStore((s) => s.filters);
 
   return {

@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { DataTable, type Column } from "@/components/data-table";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type { BreakdownLine } from "@/lib/mock-api/types";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 
 const columns: Column<BreakdownLine>[] = [
   { id: "component", header: "Component", cell: (r) => r.component },

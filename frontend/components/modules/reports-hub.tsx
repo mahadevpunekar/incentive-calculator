@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type { ReportJob, ScheduledReportJob } from "@/lib/mock-api/types";
 

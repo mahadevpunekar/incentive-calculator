@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { api } from "@/lib/mock-api/client";
 import { filterDimensional } from "@/lib/apply-global-filters";
 import type { TrendPoint } from "@/lib/mock-api/types";
-import { usePageFilterContext } from "@/hooks/use-page-filter-policy";
+import { usePageFilterContext } from "@/lib/page-filter-context";
 
 /**
  * Read-only context from accrual trend — does not drive form state or projections.
