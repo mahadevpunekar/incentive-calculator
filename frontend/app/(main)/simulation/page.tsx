@@ -102,18 +102,30 @@ function loadScenarios(): SavedScenario[] {
   }
 }
 
+/** `watch()` / DOM inputs often yield strings; `+` must not concatenate. */
+function num(x: unknown, fallback = 0): number {
+  if (typeof x === "number" && Number.isFinite(x)) return x;
+  const n = Number(x);
+  return Number.isFinite(n) ? n : fallback;
+}
+
 function project(v: Values) {
-  const dealLift = v.extraDeals * 950;
-  const pctLift = v.baseIncentiveOmr * (v.upliftPercent / 100);
+  const base = num(v.baseIncentiveOmr);
+  const extraDeals = num(v.extraDeals);
+  const upliftPercent = num(v.upliftPercent);
+  const globalCommissionPct = num(v.globalCommissionPct);
+  const acceleratorMultiplier = num(v.acceleratorMultiplier);
   const slabAvgMult =
-    (v.slab1.multiplier + v.slab2.multiplier + v.slab3.multiplier) / 3;
-  const commissionAdj =
-    v.baseIncentiveOmr * ((v.globalCommissionPct - 7.2) / 100) * 0.4;
+    (num(v.slab1.multiplier) + num(v.slab2.multiplier) + num(v.slab3.multiplier)) /
+    3;
+
+  const dealLift = extraDeals * 950;
+  const pctLift = base * (upliftPercent / 100);
+  const commissionAdj = base * ((globalCommissionPct - 7.2) / 100) * 0.4;
   const accelAdj =
-    v.baseIncentiveOmr * (v.acceleratorMultiplier - 1.35) * 0.08 * slabAvgMult;
-  return Math.round(
-    v.baseIncentiveOmr + dealLift + pctLift + commissionAdj + accelAdj
-  );
+    base * (acceleratorMultiplier - 1.35) * 0.08 * slabAvgMult;
+  const total = base + dealLift + pctLift + commissionAdj + accelAdj;
+  return Math.round(Number.isFinite(total) ? total : base);
 }
 
 export default function SimulationPage() {
@@ -382,7 +394,7 @@ export default function SimulationPage() {
                 <div className="rounded-lg border border-border/80 p-4">
                   <p className="text-xs text-muted-foreground">Baseline (form)</p>
                   <p className="text-xl font-semibold mt-1 tabular-nums">
-                    OMR {Math.round(v.baseIncentiveOmr).toLocaleString()}
+                    OMR {Math.round(num(v.baseIncentiveOmr)).toLocaleString()}
                   </p>
                 </div>
                 <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
