@@ -1,14 +1,28 @@
 import {
   mockActivities,
+  mockApprovalQueue,
+  mockAuditTrail,
   mockBreakdown,
+  mockBrokerPerformance,
+  mockChannelEarnings,
+  mockCommissionRules,
   mockDashboardAlerts,
+  mockDataQualityIssues,
   mockIntegrations,
+  mockIntegrationLogs,
   mockAccrualVarianceBuckets,
   mockIncentivePayoutCurve,
   mockKpis,
   mockLeaderboard,
   mockMonthlyPerformance,
+  mockPerformanceSignals,
+  mockNotificationCampaigns,
+  mockNotificationRules,
+  mockProductCommission,
   mockReports,
+  mockRuleEngineRules,
+  mockRuleVersions,
+  mockScheduledReports,
   mockTargets,
   mockTopExposures,
   mockTrend,
@@ -16,15 +30,29 @@ import {
 } from "./data";
 import type {
   ActivityItem,
+  ApprovalQueueItem,
+  AuditTrailEntry,
   BreakdownLine,
+  BrokerPerformanceRow,
+  ChannelEarningRow,
+  CommissionRuleSet,
   DashboardAlert,
+  DataQualityIssue,
   Integration,
+  IntegrationLogEntry,
   AccrualVarianceBucket,
   IncentivePayoutCurvePoint,
   KpiSummary,
   LeaderboardRow,
   MonthlyPerformancePoint,
+  NotificationAlertRule,
+  NotificationCampaignDraft,
+  PerformanceSignalRow,
+  ProductCommissionRow,
   ReportJob,
+  RuleEngineRule,
+  RuleVersionMeta,
+  ScheduledReportJob,
   TargetRow,
   TopExposureRow,
   TrendPoint,
@@ -97,6 +125,16 @@ export const api = {
     return [...mockIntegrations];
   },
 
+  async getIntegrationLogs(): Promise<IntegrationLogEntry[]> {
+    await delay(mockDelayMs);
+    return [...mockIntegrationLogs];
+  },
+
+  async getPerformanceSignals(): Promise<PerformanceSignalRow[]> {
+    await delay(mockDelayMs);
+    return [...mockPerformanceSignals];
+  },
+
   async getAccrualVarianceBuckets(): Promise<AccrualVarianceBucket[]> {
     await delay(mockDelayMs);
     return [...mockAccrualVarianceBuckets];
@@ -115,5 +153,65 @@ export const api = {
   async getTopExposures(): Promise<TopExposureRow[]> {
     await delay(mockDelayMs);
     return [...mockTopExposures];
+  },
+
+  async getApprovalQueue(): Promise<ApprovalQueueItem[]> {
+    await delay(mockDelayMs);
+    return [...mockApprovalQueue];
+  },
+
+  async getCommissionRules(): Promise<CommissionRuleSet[]> {
+    await delay(mockDelayMs);
+    return [...mockCommissionRules];
+  },
+
+  async getRuleVersions(): Promise<RuleVersionMeta[]> {
+    await delay(mockDelayMs);
+    return [...mockRuleVersions];
+  },
+
+  async getAuditTrail(): Promise<AuditTrailEntry[]> {
+    await delay(mockDelayMs);
+    return [...mockAuditTrail];
+  },
+
+  async getScheduledReports(): Promise<ScheduledReportJob[]> {
+    await delay(mockDelayMs);
+    return [...mockScheduledReports];
+  },
+
+  async getNotificationRules(): Promise<NotificationAlertRule[]> {
+    await delay(mockDelayMs);
+    return [...mockNotificationRules];
+  },
+
+  async getNotificationCampaigns(): Promise<NotificationCampaignDraft[]> {
+    await delay(mockDelayMs);
+    return [...mockNotificationCampaigns];
+  },
+
+  async getRuleEngineRules(): Promise<RuleEngineRule[]> {
+    await delay(mockDelayMs);
+    return [...mockRuleEngineRules];
+  },
+
+  async getDataQualityIssues(): Promise<DataQualityIssue[]> {
+    await delay(mockDelayMs);
+    return [...mockDataQualityIssues];
+  },
+
+  async getProductCommission(): Promise<ProductCommissionRow[]> {
+    await delay(mockDelayMs);
+    return [...mockProductCommission];
+  },
+
+  async getChannelEarnings(): Promise<ChannelEarningRow[]> {
+    await delay(mockDelayMs);
+    return [...mockChannelEarnings];
+  },
+
+  async getBrokerPerformance(): Promise<BrokerPerformanceRow[]> {
+    await delay(mockDelayMs);
+    return [...mockBrokerPerformance];
   },
 };

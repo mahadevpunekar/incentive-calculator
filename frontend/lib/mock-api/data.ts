@@ -1,14 +1,29 @@
+import { mockSliceAt } from "@/lib/mock-slices";
 import type {
   AccrualVarianceBucket,
   ActivityItem,
+  ApprovalQueueItem,
+  AuditTrailEntry,
   BreakdownLine,
+  BrokerPerformanceRow,
+  ChannelEarningRow,
+  CommissionRuleSet,
   DashboardAlert,
+  DataQualityIssue,
   IncentivePayoutCurvePoint,
   Integration,
+  IntegrationLogEntry,
   KpiSummary,
   LeaderboardRow,
   MonthlyPerformancePoint,
+  NotificationAlertRule,
+  NotificationCampaignDraft,
+  PerformanceSignalRow,
+  ProductCommissionRow,
   ReportJob,
+  RuleEngineRule,
+  RuleVersionMeta,
+  ScheduledReportJob,
   TargetRow,
   TopExposureRow,
   TrendPoint,
@@ -55,22 +70,124 @@ export const mockKpis: KpiSummary[] = [
 ];
 
 export const mockTrend: TrendPoint[] = [
-  { period: "Jan", revenue: 280000, incentive: 11200 },
-  { period: "Feb", revenue: 310000, incentive: 12800 },
-  { period: "Mar", revenue: 355000, incentive: 14600 },
-  { period: "Apr", revenue: 298000, incentive: 12100 },
-  { period: "May", revenue: 332000, incentive: 13500 },
-  { period: "Jun", revenue: 368000, incentive: 15180 },
+  {
+    period: "Jul",
+    revenue: 265000,
+    incentive: 10600,
+    slice: mockSliceAt(0),
+  },
+  {
+    period: "Aug",
+    revenue: 272000,
+    incentive: 10950,
+    slice: mockSliceAt(1),
+  },
+  {
+    period: "Sep",
+    revenue: 288000,
+    incentive: 11520,
+    slice: mockSliceAt(2),
+  },
+  {
+    period: "Oct",
+    revenue: 295000,
+    incentive: 11880,
+    slice: mockSliceAt(3),
+  },
+  {
+    period: "Nov",
+    revenue: 302000,
+    incentive: 12100,
+    slice: mockSliceAt(4),
+  },
+  {
+    period: "Dec",
+    revenue: 318000,
+    incentive: 12720,
+    slice: mockSliceAt(5),
+  },
+  {
+    period: "Jan",
+    revenue: 280000,
+    incentive: 11200,
+    slice: mockSliceAt(6),
+  },
+  {
+    period: "Feb",
+    revenue: 310000,
+    incentive: 12800,
+    slice: mockSliceAt(7),
+  },
+  {
+    period: "Mar",
+    revenue: 355000,
+    incentive: 14600,
+    slice: mockSliceAt(0),
+  },
+  {
+    period: "Apr",
+    revenue: 298000,
+    incentive: 12100,
+    slice: mockSliceAt(1),
+  },
+  {
+    period: "May",
+    revenue: 332000,
+    incentive: 13500,
+    slice: mockSliceAt(2),
+  },
+  {
+    period: "Jun",
+    revenue: 368000,
+    incentive: 15180,
+    slice: mockSliceAt(3),
+  },
 ];
 
-/** Monthly achievement % for dashboard line chart */
+/** Monthly achievement + incentive for MoM / YoY dashboard */
 export const mockMonthlyPerformance: MonthlyPerformancePoint[] = [
-  { month: "Jan", achievementPct: 72 },
-  { month: "Feb", achievementPct: 76 },
-  { month: "Mar", achievementPct: 81 },
-  { month: "Apr", achievementPct: 78 },
-  { month: "May", achievementPct: 83 },
-  { month: "Jun", achievementPct: 85 },
+  {
+    month: "Jan",
+    achievementPct: 72,
+    incentiveK: 11.2,
+    incentivePriorYearK: 9.8,
+    slice: mockSliceAt(0),
+  },
+  {
+    month: "Feb",
+    achievementPct: 76,
+    incentiveK: 12.8,
+    incentivePriorYearK: 10.5,
+    slice: mockSliceAt(1),
+  },
+  {
+    month: "Mar",
+    achievementPct: 81,
+    incentiveK: 14.6,
+    incentivePriorYearK: 11.9,
+    slice: mockSliceAt(2),
+  },
+  {
+    month: "Apr",
+    achievementPct: 78,
+    incentiveK: 12.1,
+    incentivePriorYearK: 11.2,
+    slice: mockSliceAt(3),
+  },
+  {
+    month: "May",
+    achievementPct: 83,
+    incentiveK: 13.5,
+    incentivePriorYearK: 12.0,
+    slice: mockSliceAt(4),
+  },
+  {
+    month: "Jun",
+    achievementPct: 85,
+    incentiveK: 15.18,
+    incentivePriorYearK: 12.7,
+    slice: mockSliceAt(5),
+  },
 ];
 
 export const mockActivities: ActivityItem[] = [
@@ -121,6 +238,7 @@ export const mockLeaderboard: LeaderboardRow[] = [
     incentive: 52800,
     kpiScore: 94,
     delta: 1,
+    slice: mockSliceAt(0),
   },
   {
     id: "lb-2",
@@ -131,6 +249,7 @@ export const mockLeaderboard: LeaderboardRow[] = [
     incentive: 49200,
     kpiScore: 91,
     delta: -1,
+    slice: mockSliceAt(1),
   },
   {
     id: "lb-3",
@@ -141,6 +260,7 @@ export const mockLeaderboard: LeaderboardRow[] = [
     incentive: 46100,
     kpiScore: 88,
     delta: 0,
+    slice: mockSliceAt(2),
   },
   {
     id: "lb-4",
@@ -151,6 +271,7 @@ export const mockLeaderboard: LeaderboardRow[] = [
     incentive: 40200,
     kpiScore: 84,
     delta: 2,
+    slice: mockSliceAt(3),
   },
   {
     id: "lb-5",
@@ -161,6 +282,7 @@ export const mockLeaderboard: LeaderboardRow[] = [
     incentive: 38100,
     kpiScore: 81,
     delta: -1,
+    slice: mockSliceAt(4),
   },
 ];
 
@@ -171,6 +293,7 @@ export const mockBreakdown: BreakdownLine[] = [
     amount: 28400,
     dealRef: "Plan FY25 — Commercial",
     period: "Q1 2026",
+    slice: mockSliceAt(0),
   },
   {
     id: "b2",
@@ -178,6 +301,7 @@ export const mockBreakdown: BreakdownLine[] = [
     amount: 9200,
     dealRef: "NB x1.15",
     period: "Q1 2026",
+    slice: mockSliceAt(1),
   },
   {
     id: "b3",
@@ -185,6 +309,7 @@ export const mockBreakdown: BreakdownLine[] = [
     amount: 4580,
     dealRef: "Motor renewals > 92%",
     period: "Q1 2026",
+    slice: mockSliceAt(2),
   },
 ];
 
@@ -195,6 +320,7 @@ export const mockReports: ReportJob[] = [
     format: "pdf",
     lastRun: "2026-04-01",
     status: "ready",
+    slice: mockSliceAt(0),
   },
   {
     id: "r2",
@@ -202,6 +328,7 @@ export const mockReports: ReportJob[] = [
     format: "xlsx",
     lastRun: "2026-03-28",
     status: "scheduled",
+    slice: mockSliceAt(1),
   },
   {
     id: "r3",
@@ -209,6 +336,7 @@ export const mockReports: ReportJob[] = [
     format: "csv",
     lastRun: "2026-03-15",
     status: "failed",
+    slice: mockSliceAt(2),
   },
 ];
 
@@ -264,16 +392,76 @@ export const mockIntegrations: Integration[] = [
 
 /** Recognition buckets: variance = earned − expected (accrual). Chart cumulates Σ variance. */
 export const mockAccrualVarianceBuckets: AccrualVarianceBucket[] = [
-  { bucket: "W1", earnedK: 9.2, expectedK: 10.5, varianceK: -1.3 },
-  { bucket: "W2", earnedK: 11.0, expectedK: 10.8, varianceK: 0.2 },
-  { bucket: "W3", earnedK: 10.4, expectedK: 11.2, varianceK: -0.8 },
-  { bucket: "W4", earnedK: 12.6, expectedK: 11.0, varianceK: 1.6 },
-  { bucket: "W5", earnedK: 11.8, expectedK: 12.4, varianceK: -0.6 },
-  { bucket: "W6", earnedK: 13.1, expectedK: 12.0, varianceK: 1.1 },
-  { bucket: "W7", earnedK: 12.0, expectedK: 12.8, varianceK: -0.8 },
-  { bucket: "W8", earnedK: 14.2, expectedK: 12.5, varianceK: 1.7 },
-  { bucket: "W9", earnedK: 13.5, expectedK: 13.2, varianceK: 0.3 },
-  { bucket: "W10", earnedK: 14.0, expectedK: 13.8, varianceK: 0.2 },
+  {
+    bucket: "W1",
+    earnedK: 9.2,
+    expectedK: 10.5,
+    varianceK: -1.3,
+    slice: mockSliceAt(0),
+  },
+  {
+    bucket: "W2",
+    earnedK: 11.0,
+    expectedK: 10.8,
+    varianceK: 0.2,
+    slice: mockSliceAt(1),
+  },
+  {
+    bucket: "W3",
+    earnedK: 10.4,
+    expectedK: 11.2,
+    varianceK: -0.8,
+    slice: mockSliceAt(2),
+  },
+  {
+    bucket: "W4",
+    earnedK: 12.6,
+    expectedK: 11.0,
+    varianceK: 1.6,
+    slice: mockSliceAt(3),
+  },
+  {
+    bucket: "W5",
+    earnedK: 11.8,
+    expectedK: 12.4,
+    varianceK: -0.6,
+    slice: mockSliceAt(4),
+  },
+  {
+    bucket: "W6",
+    earnedK: 13.1,
+    expectedK: 12.0,
+    varianceK: 1.1,
+    slice: mockSliceAt(5),
+  },
+  {
+    bucket: "W7",
+    earnedK: 12.0,
+    expectedK: 12.8,
+    varianceK: -0.8,
+    slice: mockSliceAt(6),
+  },
+  {
+    bucket: "W8",
+    earnedK: 14.2,
+    expectedK: 12.5,
+    varianceK: 1.7,
+    slice: mockSliceAt(7),
+  },
+  {
+    bucket: "W9",
+    earnedK: 13.5,
+    expectedK: 13.2,
+    varianceK: 0.3,
+    slice: mockSliceAt(0),
+  },
+  {
+    bucket: "W10",
+    earnedK: 14.0,
+    expectedK: 13.8,
+    varianceK: 0.2,
+    slice: mockSliceAt(1),
+  },
 ];
 
 /**
@@ -288,6 +476,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 0,
     payoutMultiplier: 0,
     appliedSlab: "Below threshold (<80%)",
+    slice: mockSliceAt(0),
   },
   {
     label: "W4",
@@ -296,6 +485,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 0,
     payoutMultiplier: 0,
     appliedSlab: "Below threshold (<80%)",
+    slice: mockSliceAt(1),
   },
   {
     label: "W6",
@@ -304,6 +494,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 0.9,
     payoutMultiplier: 0.12,
     appliedSlab: "Threshold approach (ramp)",
+    slice: mockSliceAt(2),
   },
   {
     label: "W7",
@@ -312,6 +503,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 6.2,
     payoutMultiplier: 0.72,
     appliedSlab: "Target band (80–100%)",
+    slice: mockSliceAt(3),
   },
   {
     label: "W8",
@@ -320,6 +512,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 12.4,
     payoutMultiplier: 1.0,
     appliedSlab: "Target band (80–100%)",
+    slice: mockSliceAt(4),
   },
   {
     label: "W9",
@@ -328,6 +521,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 17.8,
     payoutMultiplier: 1.12,
     appliedSlab: "Target band (80–100%)",
+    slice: mockSliceAt(5),
   },
   {
     label: "W10",
@@ -336,6 +530,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 22.6,
     payoutMultiplier: 1.22,
     appliedSlab: "Target band (80–100%)",
+    slice: mockSliceAt(6),
   },
   {
     label: "W11",
@@ -344,6 +539,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 31.4,
     payoutMultiplier: 1.35,
     appliedSlab: "Accelerator (>100%)",
+    slice: mockSliceAt(7),
   },
   {
     label: "W12",
@@ -352,6 +548,7 @@ export const mockIncentivePayoutCurve: IncentivePayoutCurvePoint[] = [
     incentiveEarnedK: 38.2,
     payoutMultiplier: 1.42,
     appliedSlab: "Accelerator (>100%)",
+    slice: mockSliceAt(0),
   },
 ];
 
@@ -362,6 +559,7 @@ export const mockDashboardAlerts: DashboardAlert[] = [
     title: "Accelerator band at risk",
     metric: "Motor renewals −8% vs run-rate",
     detail: "Commercial — Muscat · Review before 12 Apr cutoff",
+    slice: mockSliceAt(0),
   },
   {
     id: "da-2",
@@ -369,6 +567,7 @@ export const mockDashboardAlerts: DashboardAlert[] = [
     title: "Payout reconciliation lag",
     metric: "OMR 8.4k pending sign-off",
     detail: "Finance queue · SLA 48h",
+    slice: mockSliceAt(1),
   },
   {
     id: "da-3",
@@ -376,6 +575,7 @@ export const mockDashboardAlerts: DashboardAlert[] = [
     title: "Target drift",
     metric: "Q2 GWP trail −3.2%",
     detail: "Rolling 8-week forecast",
+    slice: mockSliceAt(2),
   },
   {
     id: "da-4",
@@ -383,6 +583,7 @@ export const mockDashboardAlerts: DashboardAlert[] = [
     title: "Plans within tolerance",
     metric: "94% of LOBs on track",
     detail: "Last full refresh · mock data",
+    slice: mockSliceAt(3),
   },
 ];
 
@@ -395,6 +596,7 @@ export const mockTopExposures: TopExposureRow[] = [
     maturity: "Aug 2027",
     amountOmr: 420000,
     sharePct: 18.4,
+    slice: mockSliceAt(0),
   },
   {
     id: "ex-2",
@@ -404,6 +606,7 @@ export const mockTopExposures: TopExposureRow[] = [
     maturity: "Jan 2026",
     amountOmr: 298000,
     sharePct: 12.1,
+    slice: mockSliceAt(1),
   },
   {
     id: "ex-3",
@@ -413,6 +616,7 @@ export const mockTopExposures: TopExposureRow[] = [
     maturity: "Mar 2028",
     amountOmr: 256000,
     sharePct: 9.8,
+    slice: mockSliceAt(2),
   },
   {
     id: "ex-4",
@@ -422,6 +626,7 @@ export const mockTopExposures: TopExposureRow[] = [
     maturity: "Dec 2026",
     amountOmr: 198000,
     sharePct: 8.2,
+    slice: mockSliceAt(3),
   },
   {
     id: "ex-5",
@@ -431,6 +636,7 @@ export const mockTopExposures: TopExposureRow[] = [
     maturity: "Rolling",
     amountOmr: 142000,
     sharePct: 6.5,
+    slice: mockSliceAt(4),
   },
   {
     id: "ex-6",
@@ -440,5 +646,622 @@ export const mockTopExposures: TopExposureRow[] = [
     maturity: "Jun 2027",
     amountOmr: 118000,
     sharePct: 5.1,
+    slice: mockSliceAt(5),
+  },
+];
+
+export const mockApprovalQueue: ApprovalQueueItem[] = [
+  {
+    id: "ap-1",
+    title: "Q2 accelerator true-up — Commercial Muscat",
+    detail: "Batch ref INC-2026-Q2-014 · 14 producers",
+    amountOmr: 18420,
+    submitter: "Ahmed Al-Rashid",
+    submittedAt: "2026-04-08T09:12:00",
+    status: "pending",
+    currentStage: "ops",
+    stages: [
+      {
+        stage: "sales",
+        label: "Sales",
+        status: "complete",
+        actor: "Sara Al-Mansoori",
+        actedAt: "2026-04-08T10:05:00",
+        comment: "Targets verified against CRM.",
+      },
+      {
+        stage: "ops",
+        label: "Operations",
+        status: "pending",
+      },
+      { stage: "finance", label: "Finance", status: "pending" },
+    ],
+  },
+  {
+    id: "ap-2",
+    title: "Motor retail SPIFF — March close",
+    detail: "Promo code MRT-03 · 38 policies",
+    amountOmr: 4920,
+    submitter: "Layla Al-Balushi",
+    submittedAt: "2026-04-07T14:40:00",
+    status: "pending",
+    currentStage: "sales",
+    stages: [
+      { stage: "sales", label: "Sales", status: "pending" },
+      { stage: "ops", label: "Operations", status: "pending" },
+      { stage: "finance", label: "Finance", status: "pending" },
+    ],
+  },
+  {
+    id: "ap-3",
+    title: "Marine hull override — Port deal",
+    detail: "Exception per UW committee 02-Apr",
+    amountOmr: 6200,
+    submitter: "Omar Al-Siyabi",
+    submittedAt: "2026-04-05T11:00:00",
+    status: "approved",
+    currentStage: "finance",
+    stages: [
+      {
+        stage: "sales",
+        label: "Sales",
+        status: "complete",
+        actor: "Sara Al-Mansoori",
+        actedAt: "2026-04-05T15:20:00",
+      },
+      {
+        stage: "ops",
+        label: "Operations",
+        status: "complete",
+        actor: "Hilal Al-Mahrouqi",
+        actedAt: "2026-04-06T09:00:00",
+        comment: "Pricing sign-off attached.",
+      },
+      {
+        stage: "finance",
+        label: "Finance",
+        status: "complete",
+        actor: "Finance Ops",
+        actedAt: "2026-04-07T08:30:00",
+        comment: "Accrual posted.",
+      },
+    ],
+  },
+  {
+    id: "ap-4",
+    title: "Health group renewal accelerator",
+    detail: "Rejected — incomplete eligibility file",
+    amountOmr: 11200,
+    submitter: "Noor Al-Hinai",
+    submittedAt: "2026-04-02T16:00:00",
+    status: "rejected",
+    currentStage: "ops",
+    stages: [
+      {
+        stage: "sales",
+        label: "Sales",
+        status: "complete",
+        actor: "Sara Al-Mansoori",
+        actedAt: "2026-04-02T17:00:00",
+      },
+      {
+        stage: "ops",
+        label: "Operations",
+        status: "rejected",
+        actor: "Hilal Al-Mahrouqi",
+        actedAt: "2026-04-03T10:15:00",
+        comment: "Missing broker attestations — resubmit with pack B.",
+      },
+      { stage: "finance", label: "Finance", status: "pending" },
+    ],
+  },
+];
+
+const defaultSlabs: CommissionRuleSet["slabs"] = [
+  {
+    id: "s1",
+    minAchievementPct: 0,
+    maxAchievementPct: 79,
+    commissionPct: 4.5,
+    payoutMultiplier: 0.35,
+  },
+  {
+    id: "s2",
+    minAchievementPct: 80,
+    maxAchievementPct: 100,
+    commissionPct: 7.2,
+    payoutMultiplier: 1.0,
+  },
+  {
+    id: "s3",
+    minAchievementPct: 101,
+    maxAchievementPct: 130,
+    commissionPct: 9.0,
+    payoutMultiplier: 1.35,
+  },
+];
+
+export const mockCommissionRules: CommissionRuleSet[] = [
+  {
+    id: "cr-1",
+    name: "Commercial lines — core slab",
+    product: "Commercial (all LOBs)",
+    region: "Muscat & Batinah",
+    roleScope: "Producer, RM",
+    version: "2026.1",
+    status: "active",
+    effectiveFrom: "2026-01-01",
+    updatedAt: "2026-03-18T11:00:00",
+    updatedBy: "Policy Admin",
+    slabs: defaultSlabs.map((s) => ({ ...s, id: `${s.id}-a` })),
+  },
+  {
+    id: "cr-2",
+    name: "Retail motor — retail SPIFF stack",
+    product: "Motor retail",
+    region: "National",
+    roleScope: "Producer",
+    version: "2025.4",
+    status: "active",
+    effectiveFrom: "2025-10-01",
+    updatedAt: "2026-02-02T09:30:00",
+    updatedBy: "Sara Al-Mansoori",
+    slabs: [
+      {
+        id: "m1",
+        minAchievementPct: 0,
+        maxAchievementPct: 85,
+        commissionPct: 3.8,
+        payoutMultiplier: 0.5,
+      },
+      {
+        id: "m2",
+        minAchievementPct: 86,
+        maxAchievementPct: 115,
+        commissionPct: 6.0,
+        payoutMultiplier: 1.0,
+      },
+    ],
+  },
+  {
+    id: "cr-3",
+    name: "Marine & cargo — draft Q3",
+    product: "Marine",
+    region: "Salalah, Sohar",
+    roleScope: "Producer",
+    version: "2026.2-draft",
+    status: "draft",
+    effectiveFrom: "2026-07-01",
+    updatedAt: "2026-04-01T14:00:00",
+    updatedBy: "Actuarial",
+    slabs: defaultSlabs.map((s) => ({ ...s, id: `${s.id}-d` })),
+  },
+];
+
+export const mockRuleVersions: RuleVersionMeta[] = [
+  {
+    version: "2026.1",
+    label: "2026.1 — Jan effective",
+    effectiveFrom: "2026-01-01",
+    status: "active",
+  },
+  {
+    version: "2025.4",
+    label: "2025.4 — Q4 retail",
+    effectiveFrom: "2025-10-01",
+    status: "archived",
+  },
+  {
+    version: "2026.2-draft",
+    label: "2026.2 draft (Q3)",
+    effectiveFrom: "2026-07-01",
+    status: "draft",
+  },
+];
+
+export const mockAuditTrail: AuditTrailEntry[] = [
+  {
+    id: "au-1",
+    entityType: "rule",
+    entityLabel: "Commercial lines — core slab",
+    action: "Version published",
+    actor: "Policy Admin",
+    at: "2026-03-18T11:00:05",
+    beforeSummary: "v2025.3 · 6.8% mid-band commission",
+    afterSummary: "v2026.1 · 7.2% mid-band, mult 1.0",
+  },
+  {
+    id: "au-2",
+    entityType: "payout",
+    entityLabel: "Payout batch PB-2026-04-12",
+    action: "Amount adjusted",
+    actor: "Finance Ops",
+    at: "2026-04-12T08:44:00",
+    beforeSummary: "OMR 42,180 gross",
+    afterSummary: "OMR 41,920 gross (clawback line 7)",
+  },
+  {
+    id: "au-3",
+    entityType: "approval",
+    entityLabel: "ap-3 Marine hull override",
+    action: "Stage approved",
+    actor: "Finance Ops",
+    at: "2026-04-07T08:30:12",
+    beforeSummary: "Pending finance",
+    afterSummary: "Approved · accrual posted",
+  },
+  {
+    id: "au-4",
+    entityType: "scenario",
+    entityLabel: "Simulation — Base + 5% GWP",
+    action: "Scenario saved",
+    actor: "Sara Al-Mansoori",
+    at: "2026-04-09T16:22:00",
+    beforeSummary: "—",
+    afterSummary: "OMR 44.1k projected vs OMR 42.2k base",
+  },
+  {
+    id: "au-5",
+    entityType: "rule",
+    entityLabel: "Retail motor — retail SPIFF stack",
+    action: "Slab tier edited",
+    actor: "Sara Al-Mansoori",
+    at: "2026-02-02T09:30:40",
+    beforeSummary: "86–100% · 5.8% commission",
+    afterSummary: "86–115% · 6.0% commission",
+  },
+];
+
+export const mockScheduledReports: ScheduledReportJob[] = [
+  {
+    id: "sch-1",
+    name: "Weekly payout readiness",
+    format: "xlsx",
+    cadence: "Every Mon 06:00",
+    nextRun: "2026-04-14",
+    recipients: "finance-ops@dhofar-insurance.om",
+    enabled: true,
+    slice: mockSliceAt(0),
+  },
+  {
+    id: "sch-2",
+    name: "Executive PDF pack",
+    format: "pdf",
+    cadence: "1st of month 07:00",
+    nextRun: "2026-05-01",
+    recipients: "cfo@dhofar-insurance.om, exco@…",
+    enabled: true,
+    slice: mockSliceAt(1),
+  },
+  {
+    id: "sch-3",
+    name: "Producer statements (CSV)",
+    format: "csv",
+    cadence: "Paused",
+    nextRun: "—",
+    recipients: "hr-payroll@…",
+    enabled: false,
+    slice: mockSliceAt(2),
+  },
+];
+
+export const mockNotificationRules: NotificationAlertRule[] = [
+  {
+    id: "nr-1",
+    name: "Payout batch released",
+    trigger: "When finance posts settlement file",
+    channels: ["email", "whatsapp"],
+    enabled: true,
+  },
+  {
+    id: "nr-2",
+    name: "Approval SLA breach",
+    trigger: "Queue item > 48h in same stage",
+    channels: ["email", "sms"],
+    enabled: true,
+  },
+  {
+    id: "nr-3",
+    name: "Rule engine publish",
+    trigger: "New active commission version",
+    channels: ["email"],
+    enabled: true,
+  },
+];
+
+export const mockNotificationCampaigns: NotificationCampaignDraft[] = [
+  {
+    id: "nc-1",
+    name: "Q2 kick-off — target reminder",
+    audience: "All producers · Commercial",
+    channel: "email",
+    status: "scheduled",
+    scheduledFor: "2026-04-15T08:00:00",
+  },
+  {
+    id: "nc-2",
+    name: "SPIFF leaderboard teaser",
+    audience: "Motor retail · top 200",
+    channel: "sms",
+    status: "draft",
+  },
+];
+
+export const mockRuleEngineRules: RuleEngineRule[] = [
+  {
+    id: "re-1",
+    name: "Motor — direct channel uplift",
+    priority: 10,
+    active: true,
+    conditions: [
+      {
+        id: "c1",
+        dimension: "product",
+        mode: "include",
+        values: ["Motor"],
+      },
+      {
+        id: "c2",
+        dimension: "channel",
+        mode: "include",
+        values: ["Direct", "Online"],
+      },
+    ],
+    effectSummary: "+0.4% commission when both match",
+    updatedAt: "2026-04-01T10:00:00",
+    updatedBy: "Policy Admin",
+  },
+  {
+    id: "re-2",
+    name: "Exclude bancassurance from marine SPIFF",
+    priority: 20,
+    active: true,
+    conditions: [
+      {
+        id: "c3",
+        dimension: "product",
+        mode: "include",
+        values: ["Marine"],
+      },
+      {
+        id: "c4",
+        dimension: "channel",
+        mode: "exclude",
+        values: ["Bancassurance"],
+      },
+    ],
+    effectSummary: "SPIFF stack suppressed for excluded channel",
+    updatedAt: "2026-03-22T14:30:00",
+    updatedBy: "Actuarial",
+  },
+  {
+    id: "re-3",
+    name: "Producer role — medical only",
+    priority: 5,
+    active: false,
+    conditions: [
+      {
+        id: "c5",
+        dimension: "role",
+        mode: "include",
+        values: ["Producer"],
+      },
+      {
+        id: "c6",
+        dimension: "product",
+        mode: "include",
+        values: ["Medical"],
+      },
+    ],
+    effectSummary: "Draft — tier-2 medical kicker",
+    updatedAt: "2026-04-08T09:00:00",
+    updatedBy: "Sara Al-Mansoori",
+  },
+];
+
+export const mockDataQualityIssues: DataQualityIssue[] = [
+  {
+    id: "dq-1",
+    severity: "error",
+    checkName: "Policy premium completeness",
+    description:
+      "12 policies missing written premium before incentive run (batch 2026-04-11).",
+    source: "Core policy feed",
+    detectedAt: "2026-04-11T06:00:00",
+    status: "open",
+    slice: mockSliceAt(0),
+  },
+  {
+    id: "dq-2",
+    severity: "warning",
+    checkName: "Producer hierarchy",
+    description:
+      "3 deals linked to inactive RM codes — commission path ambiguous.",
+    source: "HR master",
+    detectedAt: "2026-04-10T11:20:00",
+    status: "raised_it",
+    resolutionNote: "ITSD-4482 logged · awaiting HR refresh",
+    slice: mockSliceAt(1),
+  },
+  {
+    id: "dq-3",
+    severity: "info",
+    checkName: "Channel mapping",
+    description: "Broker code BRC-992 duplicated across two legal entities.",
+    source: "Channel reference",
+    detectedAt: "2026-04-09T15:00:00",
+    status: "resolved",
+    resolutionNote: "Merged to canonical broker parent 08-Apr",
+    slice: mockSliceAt(2),
+  },
+];
+
+export const mockProductCommission: ProductCommissionRow[] = [
+  {
+    product: "Motor",
+    commissionOmr: 186400,
+    pctOfTotal: 38.2,
+    yoyDeltaPct: 6.4,
+    slice: mockSliceAt(0),
+  },
+  {
+    product: "Medical",
+    commissionOmr: 98200,
+    pctOfTotal: 20.1,
+    yoyDeltaPct: 3.1,
+    slice: mockSliceAt(1),
+  },
+  {
+    product: "Marine",
+    commissionOmr: 75400,
+    pctOfTotal: 15.4,
+    yoyDeltaPct: -1.2,
+    slice: mockSliceAt(2),
+  },
+  {
+    product: "Property",
+    commissionOmr: 62100,
+    pctOfTotal: 12.7,
+    yoyDeltaPct: 4.8,
+    slice: mockSliceAt(3),
+  },
+  {
+    product: "Engineering",
+    commissionOmr: 66400,
+    pctOfTotal: 13.6,
+    yoyDeltaPct: 2.0,
+    slice: mockSliceAt(4),
+  },
+];
+
+export const mockChannelEarnings: ChannelEarningRow[] = [
+  {
+    channel: "Direct",
+    earningsOmr: 198200,
+    policies: 8420,
+    slice: mockSliceAt(0),
+  },
+  {
+    channel: "Broker",
+    earningsOmr: 174800,
+    policies: 6230,
+    slice: mockSliceAt(1),
+  },
+  {
+    channel: "Bancassurance",
+    earningsOmr: 72100,
+    policies: 2104,
+    slice: mockSliceAt(2),
+  },
+  {
+    channel: "Online",
+    earningsOmr: 46400,
+    policies: 3891,
+    slice: mockSliceAt(3),
+  },
+];
+
+export const mockBrokerPerformance: BrokerPerformanceRow[] = [
+  {
+    id: "br-1",
+    broker: "Oman Insurance Brokers LLC",
+    channel: "Broker",
+    gwpOmr: 4200000,
+    commissionOmr: 168000,
+    rank: 1,
+    slice: mockSliceAt(1),
+  },
+  {
+    id: "br-2",
+    broker: "Gulf Risk Partners",
+    channel: "Broker",
+    gwpOmr: 2980000,
+    commissionOmr: 119200,
+    rank: 2,
+    slice: mockSliceAt(1),
+  },
+  {
+    id: "br-3",
+    broker: "Muscat Financial Services",
+    channel: "Bancassurance",
+    gwpOmr: 1850000,
+    commissionOmr: 64800,
+    rank: 3,
+    slice: mockSliceAt(2),
+  },
+  {
+    id: "br-4",
+    broker: "Salalah Marine Agency",
+    channel: "Broker",
+    gwpOmr: 1120000,
+    commissionOmr: 44800,
+    rank: 4,
+    slice: mockSliceAt(1),
+  },
+];
+
+export const mockPerformanceSignals: PerformanceSignalRow[] = [
+  {
+    id: "ps-1",
+    metric: "Team GWP run-rate",
+    value: "OMR 1.02M / mo",
+    context: "vs target 1.08M · rolling 8 weeks",
+    slice: mockSliceAt(0),
+  },
+  {
+    id: "ps-2",
+    metric: "Incentive accrual coverage",
+    value: "97.4%",
+    context: "Policies with valid producer mapping",
+    slice: mockSliceAt(1),
+  },
+  {
+    id: "ps-3",
+    metric: "Quality pass rate",
+    value: "94%",
+    context: "Pre-payout validation batches",
+    slice: mockSliceAt(2),
+  },
+  {
+    id: "ps-4",
+    metric: "Avg cycle — deal to accrual",
+    value: "3.2 days",
+    context: "Commercial lines · median",
+    slice: mockSliceAt(3),
+  },
+];
+
+export const mockIntegrationLogs: IntegrationLogEntry[] = [
+  {
+    id: "il-1",
+    at: "2026-04-11T08:12:00",
+    level: "info",
+    integration: "Core policy API",
+    message: "Incremental sync completed · 1,240 policies",
+    slice: mockSliceAt(0),
+  },
+  {
+    id: "il-2",
+    at: "2026-04-11T07:55:00",
+    level: "warn",
+    integration: "Broker portal feed",
+    message: "12 rows skipped — missing broker licence code",
+    slice: mockSliceAt(1),
+  },
+  {
+    id: "il-3",
+    at: "2026-04-10T22:01:00",
+    level: "error",
+    integration: "HR master",
+    message: "Auth token expired — retry scheduled",
+    slice: mockSliceAt(2),
+  },
+  {
+    id: "il-4",
+    at: "2026-04-10T18:40:00",
+    level: "info",
+    integration: "Bancassurance SFTP",
+    message: "File ACK received · batch APR10-BNK",
+    slice: mockSliceAt(3),
   },
 ];

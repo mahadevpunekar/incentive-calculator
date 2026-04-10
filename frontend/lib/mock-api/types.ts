@@ -17,12 +17,31 @@ export type KpiSummary = {
   trend?: "up" | "down" | "neutral";
 };
 
-export type TrendPoint = { period: string; revenue: number; incentive: number };
+/** Slice tags for global dashboard filters (mock). */
+export type DataSliceDimensions = {
+  channel: string;
+  region: string;
+  branch: string;
+  staff: string;
+  product: string;
+  /** Short month label aligned with mock series */
+  month: string;
+};
+
+export type TrendPoint = {
+  period: string;
+  revenue: number;
+  incentive: number;
+  slice: DataSliceDimensions;
+};
 
 /** Monthly achievement % (or composite performance index) for dashboard line chart */
 export type MonthlyPerformancePoint = {
   month: string;
   achievementPct: number;
+  incentiveK: number;
+  incentivePriorYearK: number;
+  slice: DataSliceDimensions;
 };
 
 export type ActivityItem = {
@@ -42,6 +61,7 @@ export type LeaderboardRow = {
   incentive: number;
   kpiScore: number;
   delta?: number;
+  slice: DataSliceDimensions;
 };
 
 export type BreakdownLine = {
@@ -50,6 +70,7 @@ export type BreakdownLine = {
   amount: number;
   dealRef?: string;
   period: string;
+  slice: DataSliceDimensions;
 };
 
 export type ReportJob = {
@@ -58,6 +79,7 @@ export type ReportJob = {
   format: "pdf" | "xlsx" | "csv";
   lastRun: string;
   status: "ready" | "scheduled" | "failed";
+  slice: DataSliceDimensions;
 };
 
 export type TargetRow = {
@@ -89,6 +111,7 @@ export type AccrualVarianceBucket = {
   expectedK: number;
   /** earnedK − expectedK (OMR k) */
   varianceK: number;
+  slice: DataSliceDimensions;
 };
 
 /** One point on the achievement → payout curve (slab rules applied). */
@@ -105,6 +128,7 @@ export type IncentivePayoutCurvePoint = {
   payoutMultiplier: number;
   /** Applied incentive slab / band */
   appliedSlab: string;
+  slice: DataSliceDimensions;
 };
 
 export type DashboardAlertSeverity = "critical" | "warning" | "info";
@@ -115,6 +139,7 @@ export type DashboardAlert = {
   title: string;
   metric: string;
   detail: string;
+  slice: DataSliceDimensions;
 };
 
 export type TopExposureRow = {
@@ -125,4 +150,180 @@ export type TopExposureRow = {
   maturity: string;
   amountOmr: number;
   sharePct: number;
+  slice: DataSliceDimensions;
+};
+
+/** Rule engine: inclusion / exclusion on dimensions (mock). */
+export type RuleEngineCondition = {
+  id: string;
+  dimension: "product" | "role" | "channel";
+  mode: "include" | "exclude";
+  values: string[];
+};
+
+export type RuleEngineRule = {
+  id: string;
+  name: string;
+  priority: number;
+  active: boolean;
+  conditions: RuleEngineCondition[];
+  effectSummary: string;
+  updatedAt: string;
+  updatedBy: string;
+};
+
+export type DataQualityIssue = {
+  id: string;
+  severity: "error" | "warning" | "info";
+  checkName: string;
+  description: string;
+  source: string;
+  detectedAt: string;
+  status: "open" | "raised_it" | "resolved";
+  resolutionNote?: string;
+  slice: DataSliceDimensions;
+};
+
+export type ProductCommissionRow = {
+  product: string;
+  commissionOmr: number;
+  pctOfTotal: number;
+  yoyDeltaPct: number;
+  slice: DataSliceDimensions;
+};
+
+export type ChannelEarningRow = {
+  channel: string;
+  earningsOmr: number;
+  policies: number;
+  slice: DataSliceDimensions;
+};
+
+export type BrokerPerformanceRow = {
+  id: string;
+  broker: string;
+  channel: string;
+  gwpOmr: number;
+  commissionOmr: number;
+  rank: number;
+  slice: DataSliceDimensions;
+};
+
+/* ——— Incentive system extensions (mock) ——— */
+
+export type ApprovalStageKey = "sales" | "ops" | "finance";
+
+export type ApprovalQueueStatus = "pending" | "approved" | "rejected";
+
+export type ApprovalStageState = {
+  stage: ApprovalStageKey;
+  label: string;
+  status: "pending" | "complete" | "rejected";
+  actor?: string;
+  actedAt?: string;
+  comment?: string;
+};
+
+export type ApprovalQueueItem = {
+  id: string;
+  title: string;
+  detail: string;
+  amountOmr: number;
+  submitter: string;
+  submittedAt: string;
+  status: ApprovalQueueStatus;
+  /** Next actor when status is pending */
+  currentStage: ApprovalStageKey;
+  stages: ApprovalStageState[];
+};
+
+export type CommissionSlabRow = {
+  id: string;
+  minAchievementPct: number;
+  maxAchievementPct: number;
+  commissionPct: number;
+  payoutMultiplier: number;
+};
+
+export type CommissionRuleSet = {
+  id: string;
+  name: string;
+  product: string;
+  region: string;
+  roleScope: string;
+  version: string;
+  status: "draft" | "active" | "archived";
+  effectiveFrom: string;
+  updatedAt: string;
+  updatedBy: string;
+  slabs: CommissionSlabRow[];
+};
+
+export type RuleVersionMeta = {
+  version: string;
+  label: string;
+  effectiveFrom: string;
+  status: "draft" | "active" | "archived";
+};
+
+export type AuditEntityType = "rule" | "payout" | "approval" | "scenario";
+
+export type AuditTrailEntry = {
+  id: string;
+  entityType: AuditEntityType;
+  entityLabel: string;
+  action: string;
+  actor: string;
+  at: string;
+  beforeSummary: string;
+  afterSummary: string;
+};
+
+export type ScheduledReportJob = {
+  id: string;
+  name: string;
+  format: "pdf" | "xlsx" | "csv";
+  cadence: string;
+  nextRun: string;
+  recipients: string;
+  enabled: boolean;
+  slice: DataSliceDimensions;
+};
+
+/** Integration sync / ingest log lines (mock) */
+export type IntegrationLogEntry = {
+  id: string;
+  at: string;
+  level: "info" | "warn" | "error";
+  integration: string;
+  message: string;
+  slice: DataSliceDimensions;
+};
+
+/** Performance summary signals for filterable operational view (mock) */
+export type PerformanceSignalRow = {
+  id: string;
+  metric: string;
+  value: string;
+  context: string;
+  slice: DataSliceDimensions;
+};
+
+export type NotificationChannelId = "email" | "sms" | "whatsapp";
+
+export type NotificationAlertRule = {
+  id: string;
+  name: string;
+  trigger: string;
+  channels: NotificationChannelId[];
+  enabled: boolean;
+};
+
+export type NotificationCampaignDraft = {
+  id: string;
+  name: string;
+  audience: string;
+  channel: NotificationChannelId;
+  status: "draft" | "scheduled" | "sent";
+  scheduledFor?: string;
 };

@@ -2,24 +2,94 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight, PanelLeft } from "lucide-react";
+import * as React from "react";
+import { ChevronDown, ChevronLeft, ChevronRight, PanelLeft } from "lucide-react";
 
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { BrandLogo } from "@/components/brand/brand-logo";
+import { navSections, type NavItem } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { footerNav, mainNav } from "@/lib/navigation";
 import { useUiStore } from "@/stores/ui-store";
+
+function isItemActive(pathname: string, href: string) {
+  return (
+    pathname === href ||
+    (href !== "/dashboard" && pathname.startsWith(`${href}/`))
+  );
+}
+
+function sectionHasActive(pathname: string, items: NavItem[]) {
+  return items.some((item) => isItemActive(pathname, item.href));
+}
 
 export function AppSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
+
+  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>(
+    () =>
+      Object.fromEntries(navSections.map((s) => [s.id, true])) as Record<
+        string,
+        boolean
+      >
+  );
+
+  React.useEffect(() => {
+    setOpenSections((prev) => {
+      const next = { ...prev };
+      for (const section of navSections) {
+        if (sectionHasActive(pathname, section.items)) {
+          next[section.id] = true;
+        }
+      }
+      return next;
+    });
+  }, [pathname]);
+
+  const renderNavLink = (item: NavItem) => {
+    const active = isItemActive(pathname, item.href);
+    const Icon = item.icon;
+    const link = (
+      <Link
+        key={item.href}
+        href={item.href}
+        className={cn(
+          "flex items-center gap-3 rounded-md border-l-[3px] py-2.5 text-sm font-medium transition-all duration-150 ease-out",
+          collapsed ? "justify-center px-0" : "pl-2.5 pr-2",
+          active
+            ? "border-primary bg-primary/10 text-primary shadow-sm dark:bg-primary/20 dark:text-primary dark:border-primary"
+            : "border-transparent text-sidebar-muted-foreground hover:bg-sidebar-accent hover:text-primary/90 dark:hover:bg-sidebar-accent/80 dark:hover:text-primary",
+          collapsed &&
+            active &&
+            "border-transparent bg-primary/12 text-primary ring-1 ring-inset ring-primary/30 dark:bg-primary/25 dark:text-primary"
+        )}
+      >
+        <Icon className="h-4 w-4 shrink-0" aria-hidden />
+        {!collapsed ? <span className="truncate">{item.title}</span> : null}
+      </Link>
+    );
+
+    if (collapsed) {
+      return (
+        <Tooltip key={item.href}>
+          <TooltipTrigger asChild>{link}</TooltipTrigger>
+          <TooltipContent side="right">{item.title}</TooltipContent>
+        </Tooltip>
+      );
+    }
+    return link;
+  };
 
   return (
     <aside
@@ -101,82 +171,61 @@ export function AppSidebar({ className }: { className?: string }) {
         )}
       </div>
 
-      <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-white py-3 px-2 dark:bg-sidebar">
-        <div className="grid gap-1">
-          {mainNav.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
-            const Icon = item.icon;
-            const link = (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-md border-l-[3px] py-2.5 text-sm font-medium transition-all duration-150 ease-out",
-                  collapsed ? "justify-center px-0" : "pl-2.5 pr-2",
-                  active
-                    ? "border-primary bg-primary/10 text-primary shadow-sm dark:bg-primary/20 dark:text-primary dark:border-primary"
-                    : "border-transparent text-sidebar-muted-foreground hover:bg-sidebar-accent hover:text-primary/90 dark:hover:bg-sidebar-accent/80 dark:hover:text-primary",
-                  collapsed &&
-                    active &&
-                    "border-transparent bg-primary/12 text-primary ring-1 ring-inset ring-primary/30 dark:bg-primary/25 dark:text-primary"
-                )}
-              >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                {!collapsed ? (
-                  <span className="truncate">{item.title}</span>
+      <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-white py-2 px-2 dark:bg-sidebar">
+        {collapsed ? (
+          <div className="flex flex-col gap-0">
+            {navSections.map((section, si) => (
+              <div key={section.id}>
+                {si > 0 ? (
+                  <div className="mx-1 my-2 h-px bg-sidebar-border" aria-hidden />
                 ) : null}
-              </Link>
-            );
-
-            if (collapsed) {
-              return (
-                <Tooltip key={item.href}>
-                  <TooltipTrigger asChild>{link}</TooltipTrigger>
-                  <TooltipContent side="right">{item.title}</TooltipContent>
-                </Tooltip>
-              );
-            }
-
-            return link;
-          })}
-        </div>
+                <div className="grid gap-1">
+                  {section.items.map((item) => renderNavLink(item))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-0.5">
+            {navSections.map((section) => (
+              <Collapsible
+                key={section.id}
+                open={openSections[section.id] ?? true}
+                onOpenChange={(open) =>
+                  setOpenSections((prev) => ({ ...prev, [section.id]: open }))
+                }
+                className="group/coll"
+              >
+                <CollapsibleTrigger
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-md py-2 pl-1 pr-2 text-left text-[10px] font-semibold uppercase tracking-wider text-sidebar-muted-foreground",
+                    "outline-none transition-colors hover:text-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-sidebar"
+                  )}
+                >
+                  <ChevronDown
+                    className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=closed]/coll:-rotate-90"
+                    aria-hidden
+                  />
+                  <span className="truncate">{section.title}</span>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                  <div className="grid gap-0.5 pb-2 pt-0.5">
+                    {section.items.map((item) => renderNavLink(item))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
+          </div>
+        )}
       </nav>
 
-      <div className="shrink-0 space-y-1 border-t border-sidebar-border bg-white p-2 dark:bg-sidebar">
-        <Separator className="mb-2 bg-sidebar-border" />
-        {footerNav.map((item) => {
-          const Icon = item.icon;
-          const link = (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md border-l-[3px] border-transparent py-2.5 text-sm font-medium text-sidebar-muted-foreground transition-all duration-150 ease-out hover:bg-sidebar-accent hover:text-primary/80 dark:hover:bg-sidebar-accent/80 dark:hover:text-primary/90",
-                collapsed ? "justify-center px-0" : "pl-2.5 pr-2"
-              )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {!collapsed ? <span>{item.title}</span> : null}
-            </Link>
-          );
-          if (collapsed) {
-            return (
-              <Tooltip key={item.href}>
-                <TooltipTrigger asChild>{link}</TooltipTrigger>
-                <TooltipContent side="right">{item.title}</TooltipContent>
-              </Tooltip>
-            );
-          }
-          return link;
-        })}
+      <div className="shrink-0 border-t border-sidebar-border bg-white p-2 dark:bg-sidebar">
         {!collapsed ? (
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="mt-2 w-full justify-start gap-2 transition-colors duration-150"
+            className="w-full justify-start gap-2 transition-colors duration-150"
             onClick={toggleSidebar}
           >
             <ChevronRight className="h-4 w-4" />

@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  // Self-hosted / Docker: copy `.next/static` → `standalone/.next/static` and `public` → `standalone/public`, then `node server.js` from `standalone`
+  output: "standalone",
+};
 
 export default nextConfig;

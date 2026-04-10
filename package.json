@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "dev": "npm exec -w @ic/frontend -- next dev",
-    "build": "npm exec -w @ic/frontend -- next build",
+    "build": "npm run build -w @ic/frontend",
     "start": "npm exec -w @ic/frontend -- next start",
     "lint": "npm exec -w @ic/frontend -- next lint"
   }

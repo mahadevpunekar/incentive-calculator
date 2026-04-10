@@ -1,14 +1,18 @@
+import { PerformanceSignalsCard } from "@/components/modules/performance-signals-card";
 import { KpiCard } from "@/components/kpi-card";
 import { PageHeader } from "@/components/page-header";
 import { StatBadge } from "@/components/stat-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { api } from "@/lib/mock-api/client";
 
-export default function PerformancePage() {
+export default async function PerformancePage() {
+  const signals = await api.getPerformanceSignals();
+
   return (
     <div className="space-y-8 p-6 lg:p-8 max-w-[1600px] mx-auto w-full">
       <PageHeader
         title="Performance"
-        description="Individual and team metrics with weekly, monthly, and quarterly lenses — data wired via mock API."
+        description="Individual and team metrics. Summary KPI cards below are static placeholders; operational signals use global filters (period, channel, region)."
         actions={<StatBadge label="+4.1% QoQ" trend="up" />}
       />
 
@@ -38,6 +42,8 @@ export default function PerformancePage() {
           trend="up"
         />
       </section>
+
+      <PerformanceSignalsCard signals={signals} />
 
       <Card className="shadow-none">
         <CardHeader>

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { DataTable, type Column } from "@/components/data-table";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -52,8 +54,8 @@ export default async function IntegrationsPage() {
         title="Integrations"
         description="CRM connectors, file imports, and API sync. Validation and deduplication live in the integration service."
         actions={
-          <Button type="button" variant="outline">
-            View sync logs
+          <Button type="button" variant="outline" asChild>
+            <Link href="/integrations/logs">View sync logs</Link>
           </Button>
         }
       />
