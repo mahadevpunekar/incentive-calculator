@@ -14,6 +14,8 @@ import {
   mockIncentivePayoutCurve,
   mockKpis,
   mockLeaderboard,
+  mockMisReportRows,
+  mockMisTrend,
   mockMonthlyPerformance,
   mockPerformanceSignals,
   mockNotificationCampaigns,
@@ -44,6 +46,8 @@ import type {
   IncentivePayoutCurvePoint,
   KpiSummary,
   LeaderboardRow,
+  MisReportRow,
+  MisTrendPoint,
   MonthlyPerformancePoint,
   NotificationAlertRule,
   NotificationCampaignDraft,
@@ -87,6 +91,16 @@ export const api = {
   async getMonthlyPerformance(): Promise<MonthlyPerformancePoint[]> {
     await delay(mockDelayMs);
     return [...mockMonthlyPerformance];
+  },
+
+  async getMisReportRows(): Promise<MisReportRow[]> {
+    await delay(mockDelayMs);
+    return [...mockMisReportRows];
+  },
+
+  async getMisTrend(): Promise<MisTrendPoint[]> {
+    await delay(mockDelayMs);
+    return [...mockMisTrend];
   },
 
   /** Top N for dashboard mini leaderboard */

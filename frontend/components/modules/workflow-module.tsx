@@ -24,7 +24,10 @@ import type {
 } from "@/lib/mock-api/types";
 
 function stageLabel(k: ApprovalStageKey) {
-  return k === "sales" ? "Sales" : k === "ops" ? "Operations" : "Finance";
+  if (k === "sales") return "Sales";
+  if (k === "ops") return "Operations";
+  if (k === "finance") return "Finance";
+  return "Payout";
 }
 
 export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
@@ -69,7 +72,7 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
           };
         }
         /* approve */
-        const order: ApprovalStageKey[] = ["sales", "ops", "finance"];
+        const order: ApprovalStageKey[] = ["sales", "ops", "finance", "payout"];
         const idx = order.indexOf(it.currentStage);
         const next = order[idx + 1];
         const newStages = it.stages.map((s) =>
@@ -89,11 +92,7 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
         return {
           ...it,
           currentStage: next,
-          stages: newStages.map((s) =>
-            s.stage === next && s.status === "pending"
-              ? { ...s, status: "pending" as const }
-              : s
-          ),
+          stages: newStages,
         };
       })
     );
@@ -173,7 +172,7 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
               ) : (
                 <p className="text-[11px] text-muted-foreground">
                   {item.status === "approved"
-                    ? "Fully approved — finance may settle."
+                    ? "Fully approved — payout released (mock)."
                     : "Rejected — submitter notified (mock)."}
                 </p>
               )}
