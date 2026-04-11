@@ -7,7 +7,7 @@ export default function CalculatorPage() {
     <div className="space-y-8 p-6 lg:p-8 max-w-[1600px] mx-auto w-full">
       <PageHeader
         title="Incentive calculator"
-        description="Rule-driven payout preview. This screen mirrors the future NestJS calculation engine contract."
+        description="Walk through a single slice: pick channel, product, and staff, enter GWP and target, and see achievement %, incentive %, and OMR — with the slab logic spelled out beside the numbers."
         actions={
           <>
             <Button variant="outline" type="button">

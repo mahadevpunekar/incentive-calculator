@@ -9,7 +9,7 @@ export default async function RuleEnginePage() {
     <div className="space-y-8 p-6 lg:p-8 max-w-[1600px] mx-auto w-full">
       <PageHeader
         title="Rule engine"
-        description="Dimension rules on product, role, and channel with explicit include / exclude logic. Evaluated before slab math in production."
+        description="Build explainable rules: channel, product, staff, region, and branch conditions with AND/OR logic, then set the incentive % added when a deal matches."
       />
       <RuleEngineModule initial={rules} />
     </div>

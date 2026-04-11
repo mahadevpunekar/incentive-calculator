@@ -58,6 +58,11 @@ function headerCrumbs(pathname: string): { kicker: string; title: string } {
     { prefix: "/profile", kicker: "Account", title: "Profile" },
     { prefix: "/integrations", kicker: "Admin", title: "Integrations" },
     { prefix: "/admin", kicker: "Admin", title: "Administration" },
+    {
+      prefix: "/reports/mis",
+      kicker: "Reporting",
+      title: "MIS incentive report",
+    },
     { prefix: "/reports", kicker: "Reporting", title: "Reports" },
   ];
   const hit = routes.find(

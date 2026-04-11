@@ -75,6 +75,7 @@ export const navSections: NavSection[] = [
     title: "Reporting & planning",
     items: [
       { title: "Reports", href: "/reports", icon: FileBarChart },
+      { title: "MIS report", href: "/reports/mis", icon: PieChart },
       { title: "Notifications", href: "/notifications", icon: BellRing },
       { title: "Targets", href: "/targets", icon: Target },
     ],

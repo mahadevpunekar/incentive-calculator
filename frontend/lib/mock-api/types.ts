@@ -153,10 +153,15 @@ export type TopExposureRow = {
   slice: DataSliceDimensions;
 };
 
-/** Rule engine: inclusion / exclusion on dimensions (mock). */
+/** How this row combines with the previous condition (first row ignores this). */
+export type RuleConditionCombinator = "AND" | "OR";
+
+/** Rule engine: inclusion / exclusion on book dimensions (mock). */
 export type RuleEngineCondition = {
   id: string;
-  dimension: "product" | "role" | "channel";
+  /** Ignored for the first condition in the list */
+  combinator: RuleConditionCombinator;
+  dimension: "channel" | "product" | "staff" | "region" | "branch";
   mode: "include" | "exclude";
   values: string[];
 };
@@ -167,6 +172,8 @@ export type RuleEngineRule = {
   priority: number;
   active: boolean;
   conditions: RuleEngineCondition[];
+  /** Added to base commission when the rule matches (explainability demo). */
+  incentivePercent: number;
   effectSummary: string;
   updatedAt: string;
   updatedBy: string;
@@ -211,7 +218,7 @@ export type BrokerPerformanceRow = {
 
 /* ——— Incentive system extensions (mock) ——— */
 
-export type ApprovalStageKey = "sales" | "ops" | "finance";
+export type ApprovalStageKey = "sales" | "ops" | "finance" | "payout";
 
 export type ApprovalQueueStatus = "pending" | "approved" | "rejected";
 
@@ -235,6 +242,26 @@ export type ApprovalQueueItem = {
   /** Next actor when status is pending */
   currentStage: ApprovalStageKey;
   stages: ApprovalStageState[];
+};
+
+/** MIS-style incentive book row (management reporting). */
+export type MisReportRow = {
+  id: string;
+  region: string;
+  branch: string;
+  staff: string;
+  product: string;
+  gwpOmr: number;
+  targetOmr: number;
+  achievementPct: number;
+  incentivePct: number;
+  incentiveEarnedOmr: number;
+};
+
+export type MisTrendPoint = {
+  period: string;
+  gwpOmr: number;
+  incentiveOmr: number;
 };
 
 export type CommissionSlabRow = {
