@@ -218,7 +218,7 @@ export type BrokerPerformanceRow = {
 
 /* ——— Incentive system extensions (mock) ——— */
 
-export type ApprovalStageKey = "sales" | "ops" | "finance" | "payout";
+export type ApprovalStageKey = "ops" | "sales" | "finance" | "payout";
 
 export type ApprovalQueueStatus = "pending" | "approved" | "rejected";
 

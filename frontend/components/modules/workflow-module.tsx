@@ -145,15 +145,26 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
                   onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                 >
                   <div className="flex items-center gap-5">
-                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-orange-600/10 border border-orange-500/30 font-black text-orange-600 text-xs shadow-inner">
+                    <div className={cn(
+                      "h-10 w-10 flex items-center justify-center rounded-xl font-black text-xs shadow-inner border transition-all duration-500",
+                      item.status === 'approved' ? "bg-emerald-600/10 border-emerald-500/30 text-emerald-600" :
+                      item.status === 'rejected' ? "bg-red-600/10 border-red-500/30 text-red-600" :
+                      "bg-orange-600/10 border-orange-500/30 text-orange-600"
+                    )}>
                       {item.id.slice(-3)}
                     </div>
                     <div>
-                      <h3 className="text-sm font-black uppercase tracking-tight text-foreground">{item.title}</h3>
+                      <h3 className="text-sm font-black uppercase tracking-tight text-foreground flex items-center gap-2">
+                        {item.title}
+                        {item.status === 'pending' && (
+                          <span className="flex h-1.5 w-1.5 rounded-full bg-orange-600 animate-pulse" />
+                        )}
+                      </h3>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
                           <User className="h-3 w-3" /> {item.submitter}
                         </span>
+                        <div className="h-3 w-px bg-border" />
                         <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
                           <Calendar className="h-3 w-3" /> {item.submittedAt.split('T')[0]}
                         </span>
@@ -161,9 +172,22 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-8">
+                    <div className="hidden sm:block w-32 h-1 bg-muted rounded-full overflow-hidden relative">
+                      <div 
+                        className={cn(
+                          "absolute inset-y-0 left-0 transition-all duration-1000",
+                          item.status === 'approved' ? "bg-emerald-500 w-full" :
+                          item.status === 'rejected' ? "bg-red-500 w-full" :
+                          item.currentStage === 'ops' ? "bg-orange-500 w-1/4" :
+                          item.currentStage === 'sales' ? "bg-orange-500 w-2/4" :
+                          item.currentStage === 'finance' ? "bg-orange-500 w-3/4" :
+                          "bg-orange-500 w-full"
+                        )}
+                      />
+                    </div>
                     <div className="text-right">
-                      <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Incentive Batch</p>
+                      <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest leading-none mb-1">Incentive Amt</p>
                       <p className="text-lg font-black tracking-tighter text-emerald-600">OMR {item.amountOmr.toLocaleString()}</p>
                     </div>
                     <ChevronRight className={cn("h-5 w-5 text-muted-foreground transition-transform duration-300", expandedId === item.id && "rotate-90 text-orange-600")} />
@@ -172,6 +196,21 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
 
                 {expandedId === item.id && (
                   <div className="px-5 pb-6 border-t border-border bg-muted/5 animate-in slide-in-from-top-2 duration-300">
+                    <div className="py-4 border-b border-border/50 mb-4 flex items-center justify-between">
+                       <div className="flex items-center gap-2">
+                          <div className="px-2 py-0.5 rounded bg-orange-600/10 text-orange-600 text-[10px] font-black uppercase tracking-widest border border-orange-500/20">
+                             Protocol Phase {STAGE_ORDER.indexOf(item.currentStage) + 1} of 4
+                          </div>
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                             {item.currentStage === 'ops' ? 'Initialization' : stageLabels[STAGE_ORDER[STAGE_ORDER.indexOf(item.currentStage) - 1]]}
+                             <ArrowRight className="h-3 w-3" />
+                             <span className="text-foreground">{stageLabels[item.currentStage]}</span>
+                          </span>
+                       </div>
+                       <div className="text-[10px] font-bold text-muted-foreground/60 italic">
+                          Last activity: {item.stages.find(s => s.status === 'complete' || s.status === 'rejected')?.actedAt?.split('T')[1].slice(0, 5) || 'Just now'}
+                       </div>
+                    </div>
                     <div className="py-6 overflow-x-auto no-scrollbar">
                       <div className="flex items-center min-w-[600px] px-4">
                         {STAGE_ORDER.map((s, i) => {

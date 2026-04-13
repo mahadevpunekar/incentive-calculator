@@ -40,7 +40,6 @@ export const navSections: NavSection[] = [
     title: "Overview",
     items: [
       { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { title: "GWP Dashboard", href: "/gwp-dashboard", icon: Globe },
     ],
   },
   {

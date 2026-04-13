@@ -239,7 +239,7 @@ export function EnhancedWorkflowApproval({ initial }: { initial: ApprovalQueueIt
                   >
                     <div className="flex items-center gap-4 min-w-0">
                       <div className={cn(
-                        "h-10 w-10 flex items-center justify-center rounded-xl font-mono text-[10px] font-black border tracking-tighter shadow-sm",
+                        "h-10 w-10 flex items-center justify-center rounded-xl font-mono text-[10px] font-black border transition-all duration-500 shadow-sm",
                         item.status === "approved" && "border-emerald-500/50 text-emerald-600 bg-emerald-500/5 dark:text-emerald-400",
                         item.status === "rejected" && "border-red-500/50 text-red-600 bg-red-500/5 dark:text-red-400",
                         item.status === "pending" && "border-orange-500/50 text-orange-600 bg-orange-500/5 dark:text-orange-400",
@@ -247,11 +247,29 @@ export function EnhancedWorkflowApproval({ initial }: { initial: ApprovalQueueIt
                         ID-{item.id.split("-")[1] || item.id}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-black tracking-tight truncate group-hover:text-orange-600 transition-colors uppercase">{item.title}</p>
-                        <p className="text-[10px] font-medium text-muted-foreground leading-tight">{item.detail}</p>
+                        <p className="text-sm font-black tracking-tight truncate group-hover:text-orange-600 transition-colors uppercase flex items-center gap-2">
+                          {item.title}
+                          {item.status === "pending" && (
+                            <span className="flex h-1.5 w-1.5 rounded-full bg-orange-600 animate-pulse" />
+                          )}
+                        </p>
+                        <p className="text-[10px] font-medium text-muted-foreground leading-tight truncate">{item.detail}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 shrink-0">
+                    <div className="flex items-center gap-8 shrink-0">
+                      <div className="hidden md:block w-24 h-1 bg-muted rounded-full overflow-hidden relative">
+                        <div 
+                          className={cn(
+                            "absolute inset-y-0 left-0 transition-all duration-1000",
+                            item.status === 'approved' ? "bg-emerald-500 w-full" :
+                            item.status === 'rejected' ? "bg-red-500 w-full" :
+                            item.currentStage === 'ops' ? "bg-orange-500 w-1/4" :
+                            item.currentStage === 'sales' ? "bg-orange-500 w-2/4" :
+                            item.currentStage === 'finance' ? "bg-orange-500 w-3/4" :
+                            "bg-orange-500 w-full"
+                          )}
+                        />
+                      </div>
                       <span className="text-base font-black tabular-nums tracking-tighter text-emerald-700 dark:text-emerald-400">
                         OMR {item.amountOmr.toLocaleString()}
                       </span>
@@ -265,6 +283,15 @@ export function EnhancedWorkflowApproval({ initial }: { initial: ApprovalQueueIt
                   {/* Expanded content */}
                   {expandedId === item.id && (
                     <div className="border-t border-border px-6 py-6 animate-in slide-in-from-top-4 fade-in duration-500 bg-muted/5 space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="px-3 py-1 rounded-full bg-orange-600/10 text-orange-600 text-[10px] font-black uppercase tracking-[0.2em] border border-orange-500/20 shadow-sm">
+                           Phase {STAGE_ORDER.indexOf(item.currentStage) + 1} / 4
+                        </div>
+                        <div className="h-px flex-1 bg-border/40" />
+                        <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                           Next: {STAGE_ORDER[STAGE_ORDER.indexOf(item.currentStage) + 1] ? stageLabels[STAGE_ORDER[STAGE_ORDER.indexOf(item.currentStage) + 1]] : 'Finalized'}
+                        </div>
+                      </div>
                       <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 border-b border-border pb-2">Logical Progression Flow</h4>
                       <WorkflowStepper stages={item.stages} currentStage={item.currentStage} />
                       <DataPreview item={item} />

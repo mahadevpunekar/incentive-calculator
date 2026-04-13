@@ -62,14 +62,9 @@ const ROUTE_RULES: RouteRule[] = [
     filterKeys: [],
   },
   {
-    match: (p) => p.startsWith("/gwp-dashboard"),
+    match: (p) => p.startsWith("/dashboard"),
     showBar: false,
     filterKeys: [],
-  },
-  {
-    match: (p) => p.startsWith("/dashboard"),
-    showBar: true,
-    filterKeys: ALL_FILTER_DIMENSIONS,
   },
   {
     match: (p) => p.startsWith("/analytics"),
