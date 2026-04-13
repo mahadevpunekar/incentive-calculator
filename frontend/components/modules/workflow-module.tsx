@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import { toast } from "sonner";
+import { Check, X, Clock, ChevronRight, ArrowRight, User, Calendar } from "lucide-react";
 
-import { ApprovalPipeline } from "@/components/modules/approval-pipeline";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -21,23 +22,48 @@ import type {
   ApprovalQueueItem,
   ApprovalQueueStatus,
   ApprovalStageKey,
+  ApprovalStageState,
 } from "@/lib/mock-api/types";
 
-function stageLabel(k: ApprovalStageKey) {
-  if (k === "sales") return "Sales";
-  if (k === "ops") return "Operations";
-  if (k === "finance") return "Finance";
-  return "Payout";
+const STAGE_ORDER: ApprovalStageKey[] = ["ops", "sales", "finance", "payout"];
+
+const stageLabels: Record<ApprovalStageKey, string> = {
+  ops: "Operations",
+  sales: "Sales",
+  finance: "Finance",
+  payout: "Payout",
+};
+
+const stageIcons: Record<ApprovalStageKey, string> = {
+  ops: "⚙️",
+  sales: "📋",
+  finance: "💰",
+  payout: "✅",
+};
+
+function StatusDot({ status }: { status: ApprovalStageState["status"] }) {
+  return (
+    <div className={cn(
+      "flex h-8 w-8 items-center justify-center rounded-lg border-2 transition-all shadow-sm",
+      status === "complete" && "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      status === "rejected" && "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400",
+      status === "pending" && "border-border bg-muted/50 text-muted-foreground",
+    )}>
+      {status === "complete" && <Check className="h-4 w-4 stroke-[3]" />}
+      {status === "rejected" && <X className="h-4 w-4 stroke-[3]" />}
+      {status === "pending" && <Clock className="h-4 w-4 stroke-[2]" />}
+    </div>
+  );
 }
 
 export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
   const [items, setItems] = React.useState<ApprovalQueueItem[]>(initial);
+  const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [action, setAction] = React.useState<"approve" | "reject">("approve");
-  const [activeItem, setActiveItem] = React.useState<ApprovalQueueItem | null>(
-    null
-  );
+  const [activeItem, setActiveItem] = React.useState<ApprovalQueueItem | null>(null);
   const [comment, setComment] = React.useState("");
+  const [filterTab, setFilterTab] = React.useState<ApprovalQueueStatus>("pending");
 
   const openDialog = (item: ApprovalQueueItem, a: "approve" | "reject") => {
     setActiveItem(item);
@@ -60,180 +86,196 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
             status: "rejected" as ApprovalQueueStatus,
             stages: it.stages.map((s) =>
               s.stage === it.currentStage
-                ? {
-                    ...s,
-                    status: "rejected" as const,
-                    actor,
-                    actedAt: now,
-                    comment: comment || "Rejected",
-                  }
+                ? { ...s, status: "rejected" as const, actor, actedAt: now, comment: comment || "Rejected" }
                 : s
             ),
           };
         }
-        /* approve */
-        const order: ApprovalStageKey[] = ["sales", "ops", "finance", "payout"];
-        const idx = order.indexOf(it.currentStage);
-        const next = order[idx + 1];
+        const idx = STAGE_ORDER.indexOf(it.currentStage);
+        const next = STAGE_ORDER[idx + 1];
         const newStages = it.stages.map((s) =>
           s.stage === it.currentStage
-            ? {
-                ...s,
-                status: "complete" as const,
-                actor,
-                actedAt: now,
-                comment: comment || undefined,
-              }
+            ? { ...s, status: "complete" as const, actor, actedAt: now, comment: comment || undefined }
             : s
         );
-        if (!next) {
-          return { ...it, status: "approved" as const, stages: newStages };
-        }
-        return {
-          ...it,
-          currentStage: next,
-          stages: newStages,
-        };
+        if (!next) return { ...it, status: "approved" as const, stages: newStages };
+        return { ...it, currentStage: next, stages: newStages };
       })
     );
 
-    toast.success(
-      action === "approve"
-        ? "Approval recorded — workflow advanced."
-        : "Rejection recorded."
-    );
+    toast.success(action === "approve" ? "Approval recorded." : "Rejection recorded.");
     setDialogOpen(false);
     setActiveItem(null);
   };
 
-  const filter = (status: ApprovalQueueStatus) =>
-    items.filter((i) => i.status === status);
-
-  const renderList = (list: ApprovalQueueItem[]) => (
-    <div className="grid gap-3">
-      {list.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border/70 bg-muted/10 px-4 py-8 text-center text-sm text-muted-foreground">
-          No items in this queue.
-        </p>
-      ) : (
-        list.map((item) => (
-          <Card
-            key={item.id}
-            className="border-border/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
-          >
-            <CardHeader className="space-y-2 pb-2">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0 space-y-1">
-                  <CardTitle className="text-sm font-semibold leading-snug">
-                    {item.title}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground">{item.detail}</p>
-                </div>
-                <Badge variant="outline" className="shrink-0 font-mono text-[10px]">
-                  {item.id}
-                </Badge>
-              </div>
-              <ApprovalPipeline stages={item.stages} />
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
-              <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                <span>
-                  <span className="font-medium text-foreground">Amount</span>{" "}
-                  OMR {item.amountOmr.toLocaleString()}
-                </span>
-                <span>
-                  <span className="font-medium text-foreground">Submitted</span>{" "}
-                  {item.submitter} · {item.submittedAt.replace("T", " ")}
-                </span>
-                {item.status === "pending" ? (
-                  <span>
-                    <span className="font-medium text-foreground">With</span>{" "}
-                    {stageLabel(item.currentStage)}
-                  </span>
-                ) : null}
-              </div>
-              {item.status === "pending" ? (
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => openDialog(item, "approve")}
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-destructive/40 text-destructive hover:bg-destructive/10"
-                    onClick={() => openDialog(item, "reject")}
-                  >
-                    Reject
-                  </Button>
-                </div>
-              ) : (
-                <p className="text-[11px] text-muted-foreground">
-                  {item.status === "approved"
-                    ? "Fully approved — payout released (mock)."
-                    : "Rejected — submitter notified (mock)."}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        ))
-      )}
-    </div>
-  );
+  const filteredItems = items.filter((i) => i.status === filterTab);
 
   return (
-    <>
-      <Tabs defaultValue="pending" className="w-full">
-        <TabsList>
-          <TabsTrigger value="pending">
-            Pending{" "}
-            <span className="ml-1 rounded-md bg-background/80 px-1.5 py-0 text-[10px]">
-              {filter("pending").length}
-            </span>
+    <div className="space-y-6">
+      <Tabs value={filterTab} onValueChange={(v) => setFilterTab(v as any)} className="w-full">
+        <TabsList className="bg-muted/50 p-1 border border-border rounded-xl">
+          <TabsTrigger value="pending" className="rounded-lg px-6 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            Pending Approval
+            <Badge variant="secondary" className="ml-2 bg-background/20 text-inherit">{items.filter(i => i.status === 'pending').length}</Badge>
           </TabsTrigger>
-          <TabsTrigger value="approved">Approved</TabsTrigger>
-          <TabsTrigger value="rejected">Rejected</TabsTrigger>
+          <TabsTrigger value="approved" className="rounded-lg px-6 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+            Approved
+          </TabsTrigger>
+          <TabsTrigger value="rejected" className="rounded-lg px-6 data-[state=active]:bg-red-600 data-[state=active]:text-white">
+            Rejected
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="pending">{renderList(filter("pending"))}</TabsContent>
-        <TabsContent value="approved">
-          {renderList(filter("approved"))}
-        </TabsContent>
-        <TabsContent value="rejected">
-          {renderList(filter("rejected"))}
+
+        <TabsContent value={filterTab} className="mt-6 space-y-4">
+          {filteredItems.length === 0 ? (
+            <Card className="border-dashed py-20 text-center bg-muted/10">
+              <p className="text-sm font-bold text-muted-foreground/60 uppercase tracking-widest">No batches found in {filterTab} queue</p>
+            </Card>
+          ) : (
+            filteredItems.map((item) => (
+              <Card 
+                key={item.id} 
+                className={cn(
+                  "border-border overflow-hidden transition-all duration-300",
+                  expandedId === item.id ? "ring-2 ring-orange-500/20 shadow-lg border-orange-500/40" : "shadow-sm hover:shadow-md"
+                )}
+              >
+                <div 
+                  className="p-5 flex flex-wrap items-center justify-between gap-4 cursor-pointer hover:bg-muted/30 transition-all"
+                  onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-orange-600/10 border border-orange-500/30 font-black text-orange-600 text-xs shadow-inner">
+                      {item.id.slice(-3)}
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black uppercase tracking-tight text-foreground">{item.title}</h3>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
+                          <User className="h-3 w-3" /> {item.submitter}
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
+                          <Calendar className="h-3 w-3" /> {item.submittedAt.split('T')[0]}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-6">
+                    <div className="text-right">
+                      <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest">Incentive Batch</p>
+                      <p className="text-lg font-black tracking-tighter text-emerald-600">OMR {item.amountOmr.toLocaleString()}</p>
+                    </div>
+                    <ChevronRight className={cn("h-5 w-5 text-muted-foreground transition-transform duration-300", expandedId === item.id && "rotate-90 text-orange-600")} />
+                  </div>
+                </div>
+
+                {expandedId === item.id && (
+                  <div className="px-5 pb-6 border-t border-border bg-muted/5 animate-in slide-in-from-top-2 duration-300">
+                    <div className="py-6 overflow-x-auto no-scrollbar">
+                      <div className="flex items-center min-w-[600px] px-4">
+                        {STAGE_ORDER.map((s, i) => {
+                          const stage = item.stages.find(st => st.stage === s)!;
+                          const isCurrent = item.currentStage === s && item.status === 'pending';
+                          return (
+                            <React.Fragment key={s}>
+                              <div className="flex flex-col items-center gap-2 group relative">
+                                <StatusDot status={stage.status} />
+                                <div className="flex flex-col items-center">
+                                  <span className={cn(
+                                    "text-[9px] font-black uppercase tracking-widest",
+                                    stage.status === 'complete' ? "text-emerald-600" : 
+                                    stage.status === 'rejected' ? "text-red-600" :
+                                    isCurrent ? "text-orange-600" : "text-muted-foreground/40"
+                                  )}>
+                                    {stageLabels[s]}
+                                  </span>
+                                  {stage.actor && <span className="text-[8px] font-bold text-muted-foreground/50">{stage.actor}</span>}
+                                </div>
+                              </div>
+                              {i < STAGE_ORDER.length - 1 && (
+                                <div className="flex-1 h-0.5 bg-border mx-4 relative">
+                                  <div className={cn(
+                                    "absolute inset-0 transition-all duration-500",
+                                    item.stages[i+1]?.status !== 'pending' ? "bg-emerald-500" : "bg-transparent"
+                                  )} />
+                                  <ArrowRight className={cn(
+                                    "absolute left-1/2 -ml-2 -mt-2 h-4 w-4 bg-muted/5",
+                                    item.stages[i+1]?.status !== 'pending' ? "text-emerald-500" : "text-border"
+                                  )} />
+                                </div>
+                              )}
+                            </React.Fragment>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                       <div className="space-y-4">
+                          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Batch Detail Summary</h4>
+                          <div className="rounded-xl bg-background border border-border p-4 shadow-inner">
+                             <p className="text-xs font-bold text-foreground/80 leading-relaxed italic">"{item.detail}"</p>
+                          </div>
+                          {item.status === 'pending' && (
+                             <div className="flex gap-3 pt-2">
+                                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-[10px] tracking-widest px-8 shadow-lg shadow-emerald-500/20" onClick={() => openDialog(item, 'approve')}>Approve Stage</Button>
+                                <Button variant="outline" className="border-red-500/20 text-red-600 font-bold text-[10px] hover:bg-red-500/10" onClick={() => openDialog(item, 'reject')}>Reject</Button>
+                             </div>
+                          )}
+                       </div>
+
+                       <div className="space-y-4">
+                          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Audit Progression Log</h4>
+                          <div className="space-y-3">
+                            {item.stages.filter(s => s.status !== 'pending' || s.comment).map(s => (
+                              <div key={s.stage} className="flex gap-3 border-l-2 border-orange-500/20 pl-4 py-1">
+                                <span className="text-lg shrink-0">{stageIcons[s.stage]}</span>
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-black text-foreground uppercase">{stageLabels[s.stage]} Gate</span>
+                                    <Badge variant={s.status === 'complete' ? 'success' : 'destructive'} className="text-[8px] py-0 px-1.5 uppercase font-black">{s.status}</Badge>
+                                  </div>
+                                  <p className="text-xs font-bold text-muted-foreground leading-tight">{s.comment || 'System validated & moved to next gate.'}</p>
+                                  <p className="text-[9px] font-black text-muted-foreground/40 uppercase">Logged By {s.actor || 'System'} · {s.actedAt?.replace('T', ' ') || 'Pending'}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
+            ))
+          )}
         </TabsContent>
       </Tabs>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {action === "approve" ? "Approve step" : "Reject request"}
-            </DialogTitle>
-            <DialogDescription>
-              {activeItem?.title}. Comments are stored in the audit trail (mock).
-            </DialogDescription>
+            <DialogTitle className="text-lg font-black uppercase tracking-tight">{action === "approve" ? "Confirm Approval Step" : "Confirm Rejection"}</DialogTitle>
+            <DialogDescription className="text-xs font-medium">This action will be logged in the immutable audit trail for {activeItem?.id}.</DialogDescription>
           </DialogHeader>
           <Textarea
-            placeholder="Add a comment for the audit trail…"
+            placeholder="Add mandatory audit comment or context…"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="min-h-[100px]"
+            className="min-h-[120px] bg-muted/30 border-border font-medium text-xs focus:ring-orange-500/20"
           />
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
-            </Button>
+          <DialogFooter className="gap-2 sm:gap-0 mt-4">
+            <Button variant="outline" className="font-bold text-xs" onClick={() => setDialogOpen(false)}>Abort</Button>
             <Button
               variant={action === "reject" ? "destructive" : "default"}
+              className="font-black text-[10px] uppercase tracking-widest px-8 shadow-xl"
               onClick={submitAction}
             >
-              {action === "approve" ? "Confirm approve" : "Confirm reject"}
+              {action === "approve" ? "Commit Approval" : "Commit Rejection"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

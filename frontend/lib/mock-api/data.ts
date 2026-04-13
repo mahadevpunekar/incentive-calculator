@@ -661,19 +661,19 @@ export const mockApprovalQueue: ApprovalQueueItem[] = [
     submitter: "Ahmed Al-Rashid",
     submittedAt: "2026-04-08T09:12:00",
     status: "pending",
-    currentStage: "ops",
+    currentStage: "sales",
     stages: [
-      {
-        stage: "sales",
-        label: "Sales",
-        status: "complete",
-        actor: "Sara Al-Mansoori",
-        actedAt: "2026-04-08T10:05:00",
-        comment: "Targets verified against CRM.",
-      },
       {
         stage: "ops",
         label: "Operations",
+        status: "complete",
+        actor: "Hilal Al-Mahrouqi",
+        actedAt: "2026-04-08T10:05:00",
+        comment: "Operations check against inventory complete.",
+      },
+      {
+        stage: "sales",
+        label: "Sales",
         status: "pending",
       },
       { stage: "finance", label: "Finance", status: "pending" },
@@ -688,10 +688,10 @@ export const mockApprovalQueue: ApprovalQueueItem[] = [
     submitter: "Layla Al-Balushi",
     submittedAt: "2026-04-07T14:40:00",
     status: "pending",
-    currentStage: "sales",
+    currentStage: "ops",
     stages: [
-      { stage: "sales", label: "Sales", status: "pending" },
       { stage: "ops", label: "Operations", status: "pending" },
+      { stage: "sales", label: "Sales", status: "pending" },
       { stage: "finance", label: "Finance", status: "pending" },
       { stage: "payout", label: "Payout", status: "pending" },
     ],
@@ -707,17 +707,17 @@ export const mockApprovalQueue: ApprovalQueueItem[] = [
     currentStage: "payout",
     stages: [
       {
-        stage: "sales",
-        label: "Sales",
-        status: "complete",
-        actor: "Sara Al-Mansoori",
-        actedAt: "2026-04-05T15:20:00",
-      },
-      {
         stage: "ops",
         label: "Operations",
         status: "complete",
         actor: "Hilal Al-Mahrouqi",
+        actedAt: "2026-04-05T15:20:00",
+      },
+      {
+        stage: "sales",
+        label: "Sales",
+        status: "complete",
+        actor: "Sara Al-Mansoori",
         actedAt: "2026-04-06T09:00:00",
         comment: "Pricing sign-off attached.",
       },
@@ -750,13 +750,6 @@ export const mockApprovalQueue: ApprovalQueueItem[] = [
     currentStage: "ops",
     stages: [
       {
-        stage: "sales",
-        label: "Sales",
-        status: "complete",
-        actor: "Sara Al-Mansoori",
-        actedAt: "2026-04-02T17:00:00",
-      },
-      {
         stage: "ops",
         label: "Operations",
         status: "rejected",
@@ -764,6 +757,7 @@ export const mockApprovalQueue: ApprovalQueueItem[] = [
         actedAt: "2026-04-03T10:15:00",
         comment: "Missing broker attestations — resubmit with pack B.",
       },
+      { stage: "sales", label: "Sales", status: "pending" },
       { stage: "finance", label: "Finance", status: "pending" },
       { stage: "payout", label: "Payout", status: "pending" },
     ],
