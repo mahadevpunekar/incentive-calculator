@@ -19,8 +19,33 @@ function dimensionMatches(
       return f.staff === "All" || slice.staff === f.staff;
     case "product":
       return f.product === "All" || slice.product === f.product;
-    case "month":
+    case "month": {
+      if (f.dateRange?.from && f.dateRange?.to) {
+        const monthMap: Record<string, number> = {
+          Jan: 0,
+          Feb: 1,
+          Mar: 2,
+          Apr: 3,
+          May: 4,
+          Jun: 5,
+          Jul: 6,
+          Aug: 7,
+          Sep: 8,
+          Oct: 9,
+          Nov: 10,
+          Dec: 11,
+        };
+        const sliceMonthIdx = monthMap[slice.month];
+        if (sliceMonthIdx === undefined) return true;
+
+        const fromMonth = f.dateRange.from.getMonth();
+        const toMonth = f.dateRange.to.getMonth();
+        
+        // Simple within-year check for mock data
+        return sliceMonthIdx >= fromMonth && sliceMonthIdx <= toMonth;
+      }
       return f.month === "all" || slice.month === f.month;
+    }
     default:
       return true;
   }

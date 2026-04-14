@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { DateRange } from "react-day-picker";
 
 export type GlobalFilterState = {
   channel: string;
@@ -8,6 +9,7 @@ export type GlobalFilterState = {
   product: string;
   /** `all` or short month e.g. `Apr` */
   month: string;
+  dateRange: DateRange | undefined;
 };
 
 const defaults: GlobalFilterState = {
@@ -17,6 +19,7 @@ const defaults: GlobalFilterState = {
   staff: "All",
   product: "All",
   month: "all",
+  dateRange: undefined,
 };
 
 type Store = {

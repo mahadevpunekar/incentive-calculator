@@ -22,10 +22,7 @@ import { cn } from "@/lib/utils";
 import { useUiStore } from "@/stores/ui-store";
 
 function isItemActive(pathname: string, href: string) {
-  return (
-    pathname === href ||
-    (href !== "/dashboard" && pathname.startsWith(`${href}/`))
-  );
+  return pathname === href;
 }
 
 function sectionHasActive(pathname: string, items: NavItem[]) {
@@ -71,8 +68,8 @@ export function AppSidebar({ className }: { className?: string }) {
             ? "border-primary bg-primary/10 text-primary shadow-sm dark:bg-primary/20 dark:text-primary dark:border-primary"
             : "border-transparent text-sidebar-muted-foreground hover:bg-sidebar-accent hover:text-primary/90 dark:hover:bg-sidebar-accent/80 dark:hover:text-primary",
           collapsed &&
-            active &&
-            "border-transparent bg-primary/12 text-primary ring-1 ring-inset ring-primary/30 dark:bg-primary/25 dark:text-primary"
+          active &&
+          "border-transparent bg-primary/12 text-primary ring-1 ring-inset ring-primary/30 dark:bg-primary/25 dark:text-primary"
         )}
       >
         <Icon className="h-4 w-4 shrink-0" aria-hidden />

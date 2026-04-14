@@ -25,6 +25,8 @@ import {
 } from "@/stores/global-filter-store";
 import { cn } from "@/lib/utils";
 
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+
 const OPTIONS: Record<
   FilterDimension,
   readonly string[]
@@ -72,7 +74,7 @@ function SelectFilter({
       >
         {options.map((o) => (
           <option key={o} value={o}>
-            {o === "all" ? "All periods" : o}
+            {o === "all" ? "All" : o}
           </option>
         ))}
       </select>
@@ -88,7 +90,7 @@ export function GlobalFiltersBar() {
   const setFilters = useGlobalFilterStore((s) => s.setFilters);
   const reset = useGlobalFilterStore((s) => s.resetFilters);
 
-  const patch = (key: keyof GlobalFilterState, v: string) =>
+  const patch = (key: keyof GlobalFilterState, v: any) =>
     setFilters({ [key]: v });
 
   if (!policy.showBar || policy.filterKeys.length === 0) {
@@ -114,15 +116,30 @@ export function GlobalFiltersBar() {
           ) : null}
         </div>
         <div className="flex flex-1 flex-wrap gap-2 lg:gap-3">
-          {policy.filterKeys.map((dim) => (
-            <SelectFilter
-              key={dim}
-              label={FILTER_LABELS[dim]}
-              value={filters[STATE_KEY[dim]]}
-              options={OPTIONS[dim] as unknown as string[]}
-              onChange={(v) => patch(STATE_KEY[dim], v)}
-            />
-          ))}
+          {policy.filterKeys.map((dim) => {
+            if (dim === "month") {
+              return (
+                <div key={dim} className="flex min-w-[180px] flex-1 flex-col gap-0.5">
+                  <Label className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
+                    {FILTER_LABELS[dim]}
+                  </Label>
+                  <DateRangePicker
+                    date={filters.dateRange}
+                    setDate={(range) => patch("dateRange", range)}
+                  />
+                </div>
+              );
+            }
+            return (
+              <SelectFilter
+                key={dim}
+                label={FILTER_LABELS[dim]}
+                value={filters[STATE_KEY[dim]] as string}
+                options={OPTIONS[dim] as unknown as string[]}
+                onChange={(v) => patch(STATE_KEY[dim], v)}
+              />
+            );
+          })}
         </div>
         <Button
           type="button"

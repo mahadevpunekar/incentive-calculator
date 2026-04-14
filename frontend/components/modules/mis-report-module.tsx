@@ -38,7 +38,7 @@ export function MisReportModule({
 
   return (
     <div className="space-y-8">
-      <Card className="border-border/70 bg-muted/20 shadow-none">
+      {/* <Card className="border-border/70 bg-muted/20 shadow-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">What this report is for</CardTitle>
           <CardDescription className="text-xs leading-relaxed max-w-3xl">
@@ -52,6 +52,58 @@ export function MisReportModule({
             to explain payouts to sales leadership and finance in one place.
           </CardDescription>
         </CardHeader>
+      </Card> */}
+
+      <Card className="border-border/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+        <CardHeader>
+          <CardTitle className="text-base">Detail by slice</CardTitle>
+          <CardDescription className="text-xs">
+            One row per region · branch · staff · product. Achievement and
+            incentive % are illustrative for stakeholder walkthroughs.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="overflow-x-auto p-0 sm:p-6">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="text-xs whitespace-nowrap">Region</TableHead>
+                <TableHead className="text-xs whitespace-nowrap">Branch</TableHead>
+                <TableHead className="text-xs whitespace-nowrap">Staff</TableHead>
+                <TableHead className="text-xs whitespace-nowrap">Product</TableHead>
+                <TableHead className="text-xs text-right whitespace-nowrap">Target</TableHead>
+                <TableHead className="text-xs text-right whitespace-nowrap">Ach. %</TableHead>
+                <TableHead className="text-xs text-right whitespace-nowrap">Incentive %</TableHead>
+                <TableHead className="text-xs text-right whitespace-nowrap">Earned</TableHead>
+                <TableHead className="text-xs text-right whitespace-nowrap">GWP (OMR)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell className="text-xs">{r.region}</TableCell>
+                  <TableCell className="text-xs">{r.branch}</TableCell>
+                  <TableCell className="font-mono text-xs">{r.staff}</TableCell>
+                  <TableCell className="text-xs">{r.product}</TableCell>
+                  <TableCell className="text-xs text-right tabular-nums">
+                    {r.targetOmr.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-xs text-right tabular-nums">
+                    {r.achievementPct.toFixed(1)}%
+                  </TableCell>
+                  <TableCell className="text-xs text-right tabular-nums">
+                    {r.incentivePct.toFixed(2)}%
+                  </TableCell>
+                  <TableCell className="text-xs text-right tabular-nums font-medium">
+                    {r.incentiveEarnedOmr.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-xs text-right tabular-nums">
+                    {r.gwpOmr.toLocaleString()}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
       </Card>
 
       <section className="grid gap-4 lg:grid-cols-2">
@@ -111,58 +163,6 @@ export function MisReportModule({
           </div>
         </ChartCard>
       </section>
-
-      <Card className="border-border/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
-        <CardHeader>
-          <CardTitle className="text-base">Detail by slice</CardTitle>
-          <CardDescription className="text-xs">
-            One row per region · branch · staff · product. Achievement and
-            incentive % are illustrative for stakeholder walkthroughs.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="overflow-x-auto p-0 sm:p-6">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-xs whitespace-nowrap">Region</TableHead>
-                <TableHead className="text-xs whitespace-nowrap">Branch</TableHead>
-                <TableHead className="text-xs whitespace-nowrap">Staff</TableHead>
-                <TableHead className="text-xs whitespace-nowrap">Product</TableHead>
-                <TableHead className="text-xs text-right whitespace-nowrap">GWP (OMR)</TableHead>
-                <TableHead className="text-xs text-right whitespace-nowrap">Target</TableHead>
-                <TableHead className="text-xs text-right whitespace-nowrap">Ach. %</TableHead>
-                <TableHead className="text-xs text-right whitespace-nowrap">Incentive %</TableHead>
-                <TableHead className="text-xs text-right whitespace-nowrap">Earned</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell className="text-xs">{r.region}</TableCell>
-                  <TableCell className="text-xs">{r.branch}</TableCell>
-                  <TableCell className="font-mono text-xs">{r.staff}</TableCell>
-                  <TableCell className="text-xs">{r.product}</TableCell>
-                  <TableCell className="text-xs text-right tabular-nums">
-                    {r.gwpOmr.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-xs text-right tabular-nums">
-                    {r.targetOmr.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-xs text-right tabular-nums">
-                    {r.achievementPct.toFixed(1)}%
-                  </TableCell>
-                  <TableCell className="text-xs text-right tabular-nums">
-                    {r.incentivePct.toFixed(2)}%
-                  </TableCell>
-                  <TableCell className="text-xs text-right tabular-nums font-medium">
-                    {r.incentiveEarnedOmr.toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   );
 }

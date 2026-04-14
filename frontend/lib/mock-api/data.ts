@@ -793,8 +793,9 @@ export const mockCommissionRules: CommissionRuleSet[] = [
   {
     id: "cr-1",
     name: "Commercial lines — core slab",
-    product: "Commercial (all LOBs)",
+    product: "Motor Fleet - Comprehensive",
     region: "Muscat & Batinah",
+    channel: "agent",
     roleScope: "Producer, RM",
     version: "2026.1",
     status: "active",
@@ -802,12 +803,18 @@ export const mockCommissionRules: CommissionRuleSet[] = [
     updatedAt: "2026-03-18T11:00:00",
     updatedBy: "Policy Admin",
     slabs: defaultSlabs.map((s) => ({ ...s, id: `${s.id}-a` })),
+    conditions: {
+      excludeChannels: ["staff"],
+      allowedRegions: ["Muscat", "Dhofar"],
+      allowedStaffIds: ["ST-001", "ST-002"],
+    },
   },
   {
     id: "cr-2",
     name: "Retail motor — retail SPIFF stack",
-    product: "Motor retail",
+    product: "Retail Motor - Comprehensive",
     region: "National",
+    channel: "broker",
     roleScope: "Producer",
     version: "2025.4",
     status: "active",
@@ -830,12 +837,18 @@ export const mockCommissionRules: CommissionRuleSet[] = [
         payoutMultiplier: 1.0,
       },
     ],
+    conditions: {
+      excludeChannels: [],
+      allowedRegions: ["National"],
+      allowedStaffIds: [],
+    },
   },
   {
     id: "cr-3",
     name: "Marine & cargo — draft Q3",
-    product: "Marine",
+    product: "Motor Fleet - TP",
     region: "Salalah, Sohar",
+    channel: "staff",
     roleScope: "Producer",
     version: "2026.2-draft",
     status: "draft",
@@ -843,6 +856,11 @@ export const mockCommissionRules: CommissionRuleSet[] = [
     updatedAt: "2026-04-01T14:00:00",
     updatedBy: "Actuarial",
     slabs: defaultSlabs.map((s) => ({ ...s, id: `${s.id}-d` })),
+    conditions: {
+      excludeChannels: ["broker"],
+      allowedRegions: ["Salalah", "Sohar"],
+      allowedStaffIds: ["ST-003"],
+    },
   },
 ];
 

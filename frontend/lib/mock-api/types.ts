@@ -277,6 +277,7 @@ export type CommissionRuleSet = {
   name: string;
   product: string;
   region: string;
+  channel: "agent" | "broker" | "staff";
   roleScope: string;
   version: string;
   status: "draft" | "active" | "archived";
@@ -284,6 +285,11 @@ export type CommissionRuleSet = {
   updatedAt: string;
   updatedBy: string;
   slabs: CommissionSlabRow[];
+  conditions?: {
+    excludeChannels?: string[];
+    allowedRegions?: string[];
+    allowedStaffIds?: string[];
+  };
 };
 
 export type RuleVersionMeta = {
