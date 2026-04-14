@@ -150,7 +150,7 @@ export function WorkflowJourneyVisual() {
                       {phaseIntel[activeKey].actors}
                    </p>
                    <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 text-[10px] font-bold text-blue-600 italic">
-                      "Authorization restricted to regional tier-1 controllers only."
+                      &quot;Authorization restricted to regional tier-1 controllers only.&quot;
                    </div>
                 </div>
                 <div className="space-y-3">

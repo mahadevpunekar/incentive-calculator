@@ -22,7 +22,7 @@ function GrowthBadge({ value }: { value: number }) {
 export function GwpDashboardTable({ data }: { data: GwpProductRow[] }) {
   const [filter, setFilter] = React.useState("All");
   const [search, setSearch] = React.useState("");
-  const channels = React.useMemo(() => ["All", ...new Set(data.map((d) => d.channel))], [data]);
+  const channels = React.useMemo(() => ["All", ...Array.from(new Set(data.map((d) => d.channel)))], [data]);
 
   const filtered = React.useMemo(() => {
     let rows = data;

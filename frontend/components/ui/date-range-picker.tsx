@@ -31,7 +31,7 @@ export function DateRangePicker({
     if (date?.from && !month) {
       setMonth(date.from)
     }
-  }, [date?.from])
+  }, [date?.from, month])
 
   return (
     <div className={cn("grid gap-2", className)}>

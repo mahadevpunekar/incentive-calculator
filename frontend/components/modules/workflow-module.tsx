@@ -254,7 +254,7 @@ export function WorkflowModule({ initial }: { initial: ApprovalQueueItem[] }) {
                        <div className="space-y-4">
                           <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Batch Detail Summary</h4>
                           <div className="rounded-xl bg-background border border-border p-4 shadow-inner">
-                             <p className="text-xs font-bold text-foreground/80 leading-relaxed italic">"{item.detail}"</p>
+                             <p className="text-xs font-bold text-foreground/80 leading-relaxed italic">&quot;{item.detail}&quot;</p>
                           </div>
                           {item.status === 'pending' && (
                              <div className="flex gap-3 pt-2">
