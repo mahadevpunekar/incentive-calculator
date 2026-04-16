@@ -74,9 +74,16 @@ const DIM_LABEL: Record<RuleEngineCondition["dimension"], string> = {
 
 function formatConditionLine(c: RuleEngineCondition, index: number) {
   const vals = c.values.length ? c.values.join(", ") : "—";
-  const prefix =
-    index === 0 ? "" : `${c.combinator} `;
-  return `${prefix}${c.mode} ${DIM_LABEL[c.dimension]} [${vals}]`;
+  const prefix = index === 0 ? "" : `${c.combinator} `;
+  const logic = `${prefix}${c.mode} ${DIM_LABEL[c.dimension]} [${vals}]`;
+  const metrics = ` (Target: ${c.targetOmr >= 1000 ? (c.targetOmr / 1000).toFixed(0) + "K" : c.targetOmr} → +${(c.incentivePercent || 0).toFixed(2)}%)`;
+  
+  return (
+    <div key={c.id} className="font-mono mb-0.5 last:mb-0">
+      <span className="text-muted-foreground">{logic}</span>
+      <span className="text-foreground font-medium">{metrics}</span>
+    </div>
+  );
 }
 
 function emptyRule(): RuleEngineRule {
@@ -93,9 +100,10 @@ function emptyRule(): RuleEngineRule {
         dimension: "channel",
         mode: "include",
         values: ["Direct"],
+        targetOmr: 500000,
+        incentivePercent: 0.5,
       },
     ],
-    incentivePercent: 0.5,
     effectSummary: "Describe who this applies to…",
     updatedAt: new Date().toISOString().slice(0, 19),
     updatedBy: "You",
@@ -113,11 +121,17 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
       toast.error("Add at least one condition.");
       return;
     }
-    const bad = editing.conditions.some((c) => c.values.length === 0);
-    if (bad) {
+    const badValues = editing.conditions.some((c) => c.values.length === 0);
+    if (badValues) {
       toast.error("Each condition needs at least one value.");
       return;
     }
+    const badMetrics = editing.conditions.some((c) => c.targetOmr <= 0 || c.incentivePercent < 0);
+    if (badMetrics) {
+      toast.error("Ensure all conditions have a Target > 0 and Incentive % >= 0.");
+      return;
+    }
+
     setRules((prev) => {
       const i = prev.findIndex((r) => r.id === editing.id);
       const next = {
@@ -131,7 +145,7 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
       }
       return [next, ...prev];
     });
-    toast.success("Rule saved (mock). Publish to activate in the accrual engine.");
+    toast.success("Rule saved (mock). Condition-level incentives activated.");
     setOpen(false);
     setEditing(null);
   };
@@ -144,7 +158,11 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
   const openEdit = (r: RuleEngineRule) => {
     setEditing({
       ...r,
-      conditions: r.conditions.map((c) => ({ ...c })),
+      conditions: r.conditions.map((c) => ({ 
+        ...c,
+        targetOmr: c.targetOmr || 0,
+        incentivePercent: c.incentivePercent || 0
+      })),
     });
     setOpen(true);
   };
@@ -174,6 +192,8 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
           dimension: "product",
           mode: "include",
           values: ["Motor"],
+          targetOmr: 250000,
+          incentivePercent: 0.25,
         },
       ],
     });
@@ -206,30 +226,17 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
               <CardTitle className="text-base text-foreground">
-                How the rule engine is meant to work
+                Condition-Level Incentive Engine
               </CardTitle>
               <ul className="list-disc space-y-1.5 pl-4 text-xs sm:text-sm">
                 <li>
-                  Each <strong className="text-foreground">condition</strong>{" "}
-                  checks one dimension (channel, product, staff, region, or
-                  branch). <strong className="text-foreground">Include</strong>{" "}
-                  means “any of the ticked values may match”;{" "}
-                  <strong className="text-foreground">exclude</strong> blocks
-                  those values.
+                  Incentives are now defined <strong>per condition</strong>. This allows for stacking specific targets (e.g., Direct Channel goal + Motor Product goal).
                 </li>
                 <li>
-                  From the second row onward, choose{" "}
-                  <strong className="text-foreground">AND</strong> (all joined
-                  parts must hold) or{" "}
-                  <strong className="text-foreground">OR</strong> (either side
-                  can satisfy the chain, evaluated left‑to‑right).
+                  Each condition block requires its own <strong>Target (OMR)</strong> and <strong>Incentive %</strong> boost.
                 </li>
                 <li>
-                  When the rule expression matches a producer or deal in the
-                  batch, the engine adds the configured{" "}
-                  <strong className="text-foreground">incentive %</strong> on
-                  top of the base plan (mock — production stacks with caps and
-                  audit).
+                  Priority rules still apply when multiple rules apply during the payout run.
                 </li>
               </ul>
             </div>
@@ -238,7 +245,11 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
       </Card>
 
       <div className="flex justify-end">
-        <Button type="button" size="sm" onClick={openNew}>
+        <Button 
+          type="button" 
+          size="sm" 
+          onClick={openNew}
+        >
           <Plus className="mr-1.5 h-4 w-4" />
           New rule
         </Button>
@@ -248,8 +259,7 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Saved rules</CardTitle>
           <CardDescription className="text-xs">
-            Lower priority number runs earlier when multiple rules apply (mock
-            ordering).
+            Dynamic incentive stacking depends on active condition-level targets.
           </CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
@@ -258,8 +268,8 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
               <TableRow className="hover:bg-transparent">
                 <TableHead className="text-xs">Pri</TableHead>
                 <TableHead className="text-xs">Rule</TableHead>
-                <TableHead className="text-xs">Logic</TableHead>
-                <TableHead className="text-xs">Incentive +</TableHead>
+                <TableHead className="text-xs">Logic & Stacking</TableHead>
+                <TableHead className="text-xs">Total Incentive</TableHead>
                 <TableHead className="text-xs">Status</TableHead>
                 <TableHead className="w-[90px] text-xs" />
               </TableRow>
@@ -267,42 +277,41 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
             <TableBody>
               {[...rules]
                 .sort((a, b) => a.priority - b.priority)
-                .map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="tabular-nums text-xs">
-                      {r.priority}
-                    </TableCell>
-                    <TableCell className="text-xs font-medium">{r.name}</TableCell>
-                    <TableCell className="max-w-[320px] text-[11px] text-muted-foreground">
-                      {r.conditions.map((c, i) => (
-                        <div key={c.id} className="mb-0.5 font-mono last:mb-0">
-                          {formatConditionLine(c, i)}
-                        </div>
-                      ))}
-                    </TableCell>
-                    <TableCell className="tabular-nums text-xs font-medium">
-                      +{r.incentivePercent.toFixed(2)}%
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={r.active ? "success" : "secondary"}
-                        className="font-normal"
-                      >
-                        {r.active ? "On" : "Off"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
-                        onClick={() => openEdit(r)}
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                .map((r) => {
+                  const totalIncentive = r.conditions.reduce((s, c) => s + (c.incentivePercent || 0), 0);
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell className="tabular-nums text-xs">
+                        {r.priority}
+                      </TableCell>
+                      <TableCell className="text-xs font-medium">{r.name}</TableCell>
+                      <TableCell className="max-w-[400px] text-[11px]">
+                        {r.conditions.map((c, i) => formatConditionLine(c, i))}
+                      </TableCell>
+                      <TableCell className="tabular-nums text-xs font-medium">
+                        +{totalIncentive.toFixed(2)}%
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={r.active ? "success" : "secondary"}
+                          className="font-normal"
+                        >
+                          {r.active ? "On" : "Off"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => openEdit(r)}
+                        >
+                          Edit
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </CardContent>
@@ -315,8 +324,7 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
               {editing?.id.startsWith("re-new") ? "Create rule" : "Edit rule"}
             </DialogTitle>
             <DialogDescription>
-              Build conditions, combine them with AND/OR, and set the incentive
-              rate this rule adds when it matches.
+              Define condition-specific targets and cumulative payout multipliers.
             </DialogDescription>
           </DialogHeader>
           {editing ? (
@@ -345,39 +353,21 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
                   />
                 </div>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Incentive % (output)</Label>
-                  <Input
-                    type="number"
-                    step="0.05"
-                    value={editing.incentivePercent}
+              <div className="space-y-1.5">
+                <Label className="text-xs">State</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="active"
+                    checked={editing.active}
                     onChange={(e) =>
-                      setEditing({
-                        ...editing,
-                        incentivePercent: Number(e.target.value),
-                      })
+                      setEditing({ ...editing, active: e.target.checked })
                     }
+                    className="h-4 w-4 rounded border-input"
                   />
-                  <p className="text-[10px] text-muted-foreground">
-                    Added to base commission when the rule matches.
-                  </p>
-                </div>
-                <div className="flex items-end gap-2 pb-1">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="active"
-                      checked={editing.active}
-                      onChange={(e) =>
-                        setEditing({ ...editing, active: e.target.checked })
-                      }
-                      className="h-4 w-4 rounded border-input"
-                    />
-                    <Label htmlFor="active" className="text-xs font-normal">
-                      Rule active
-                    </Label>
-                  </div>
+                  <Label htmlFor="active" className="text-xs font-normal">
+                    Rule active
+                  </Label>
                 </div>
               </div>
               <div className="space-y-1.5">
@@ -392,7 +382,7 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Condition builder</Label>
+                  <Label className="text-xs font-medium underline">Condition builder</Label>
                   <Button
                     type="button"
                     variant="outline"
@@ -406,91 +396,113 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
                 {editing.conditions.map((c, idx) => (
                   <div
                     key={c.id}
-                    className="rounded-lg border border-border/70 bg-muted/15 p-3 space-y-2"
+                    className="rounded-lg border border-border/70 bg-muted/15 p-3 space-y-3"
                   >
-                    {idx > 0 ? (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                          Combine with previous
-                        </span>
-                        <select
-                          className="h-8 rounded-md border border-input bg-background px-2 text-xs"
-                          value={c.combinator}
-                          onChange={(e) =>
-                            updateCondition(c.id, {
-                              combinator: e.target
-                                .value as RuleConditionCombinator,
-                            })
-                          }
-                        >
-                          <option value="AND">AND</option>
-                          <option value="OR">OR</option>
-                        </select>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        {idx > 0 && (
+                          <select
+                            className="h-7 rounded-md border border-input bg-background px-1 text-[10px]"
+                            value={c.combinator}
+                            onChange={(e) =>
+                              updateCondition(c.id, {
+                                combinator: e.target.value as RuleConditionCombinator,
+                              })
+                            }
+                          >
+                            <option value="AND">AND</option>
+                            <option value="OR">OR</option>
+                          </select>
+                        )}
+                        <span className="text-[10px] font-medium text-muted-foreground uppercase">Segment {idx + 1}</span>
                       </div>
-                    ) : (
-                      <p className="text-[10px] text-muted-foreground">
-                        First condition — no combinator.
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                      <select
-                        className="h-8 rounded-md border border-input bg-background px-2 text-xs"
-                        value={c.dimension}
-                        onChange={(e) =>
-                          updateCondition(c.id, {
-                            dimension: e.target
-                              .value as RuleEngineCondition["dimension"],
-                            values: [],
-                          })
-                        }
-                      >
-                        {DIMENSIONS.map((d) => (
-                          <option key={d} value={d}>
-                            {DIM_LABEL[d]}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        className="h-8 rounded-md border border-input bg-background px-2 text-xs"
-                        value={c.mode}
-                        onChange={(e) =>
-                          updateCondition(c.id, {
-                            mode: e.target.value as "include" | "exclude",
-                          })
-                        }
-                      >
-                        <option value="include">Include</option>
-                        <option value="exclude">Exclude</option>
-                      </select>
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 shrink-0"
+                        className="h-6 w-6 text-muted-foreground hover:text-destructive"
                         onClick={() => removeCondition(c.id)}
                         disabled={editing.conditions.length <= 1}
-                        aria-label="Remove condition"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-[10px]">Dimension</Label>
+                        <select
+                          className="h-8 w-full rounded-md border border-input bg-background px-2 text-xs"
+                          value={c.dimension}
+                          onChange={(e) =>
+                            updateCondition(c.id, {
+                              dimension: e.target.value as RuleEngineCondition["dimension"],
+                              values: [],
+                            })
+                          }
+                        >
+                          {DIMENSIONS.map((d) => (
+                            <option key={d} value={d}>
+                              {DIM_LABEL[d]}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px]">Scope</Label>
+                        <select
+                          className="h-8 w-full rounded-md border border-input bg-background px-2 text-xs"
+                          value={c.mode}
+                          onChange={(e) =>
+                            updateCondition(c.id, {
+                              mode: e.target.value as "include" | "exclude",
+                            })
+                          }
+                        >
+                          <option value="include">Include</option>
+                          <option value="exclude">Exclude</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-[10px]">Target (OMR)</Label>
+                        <Input 
+                          type="number"
+                          className="h-8 text-xs"
+                          value={c.targetOmr}
+                          onChange={(e) => updateCondition(c.id, { targetOmr: Number(e.target.value) })}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[10px]">Incentive %</Label>
+                        <Input 
+                          type="number"
+                          step="0.05"
+                          className="h-8 text-xs font-medium"
+                          value={c.incentivePercent}
+                          onChange={(e) => updateCondition(c.id, { incentivePercent: Number(e.target.value) })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
                       {VALUE_OPTIONS[c.dimension].map((v) => (
                         <label
                           key={v}
                           className={cn(
-                            "flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-[11px]",
+                            "flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px]",
                             c.values.includes(v)
-                              ? "border-primary/50 bg-primary/10"
+                              ? "border-primary/40 bg-primary/5"
                               : "border-border/60"
                           )}
                         >
                           <input
                             type="checkbox"
                             checked={c.values.includes(v)}
-                            onChange={(e) =>
-                              toggleValues(c, v, e.target.checked)
-                            }
+                            className="h-3 w-3"
+                            onChange={(e) => toggleValues(c, v, e.target.checked)}
                           />
                           {v}
                         </label>
@@ -500,23 +512,28 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
                 ))}
               </div>
 
-              <Card className="border-dashed bg-muted/20 shadow-none">
+              <Card className="border-dashed bg-muted/10 shadow-none">
                 <CardHeader className="p-3 pb-1">
-                  <CardTitle className="text-xs font-medium text-muted-foreground">
-                    Readable expression (preview)
+                  <CardTitle className="text-[10px] font-medium text-muted-foreground uppercase">
+                    Incentive Stack Preview
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-3 pt-0">
-                  <p className="font-mono text-[11px] leading-relaxed text-foreground">
+                  <div className="space-y-1">
                     {editing.conditions.map((c, i) => (
-                      <span key={c.id}>
-                        {i > 0 ? ` ${c.combinator} ` : ""}(
-                        {c.mode} {DIM_LABEL[c.dimension]}:{" "}
-                        {c.values.join(", ") || "…"})
-                      </span>
-                    ))}{" "}
-                    → <strong>+{editing.incentivePercent}%</strong>
-                  </p>
+                      <div key={c.id} className="font-mono text-[10px] flex items-center gap-2">
+                        <span className="text-muted-foreground">{i > 0 ? c.combinator : "IF"}</span>
+                        <span>{c.mode} {DIM_LABEL[c.dimension]} [{c.values.join(", ") || "…"}]</span>
+                        <span className="text-primary font-bold">→ +{c.incentivePercent.toFixed(2)}%</span>
+                      </div>
+                    ))}
+                    <div className="pt-2 border-t border-border mt-2 flex items-center justify-between">
+                       <span className="text-[10px] font-bold text-muted-foreground">TOTAL BOOST</span>
+                       <span className="text-sm font-bold text-primary">
+                          +{editing.conditions.reduce((s, c) => s + (c.incentivePercent || 0), 0).toFixed(2)}%
+                       </span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -532,3 +549,8 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
     </div>
   );
 }
+
+const formatValue = (v: number) => {
+  if (v >= 1000) return `${(v / 1000).toFixed(0)}K`;
+  return `${v.toFixed(0)}`;
+};

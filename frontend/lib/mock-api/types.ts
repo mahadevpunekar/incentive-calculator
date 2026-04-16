@@ -164,6 +164,10 @@ export type RuleEngineCondition = {
   dimension: "channel" | "product" | "staff" | "region" | "branch";
   mode: "include" | "exclude";
   values: string[];
+  /** Target value specific to this condition (OMR) */
+  targetOmr: number;
+  /** Incentive % boost applied for this specific condition */
+  incentivePercent: number;
 };
 
 export type RuleEngineRule = {
@@ -172,8 +176,6 @@ export type RuleEngineRule = {
   priority: number;
   active: boolean;
   conditions: RuleEngineCondition[];
-  /** Added to base commission when the rule matches (explainability demo). */
-  incentivePercent: number;
   effectSummary: string;
   updatedAt: string;
   updatedBy: string;
