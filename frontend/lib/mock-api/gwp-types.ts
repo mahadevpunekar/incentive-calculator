@@ -22,6 +22,7 @@ export type GwpProductRow = {
   product: string;
   cyGwp: number;
   pyGwp: number;
+  targetOmr: number; // Added for target achievement tracking
   growthPct: number;
   cyLossRatio: number;
   pyLossRatio: number;
@@ -29,6 +30,7 @@ export type GwpProductRow = {
   cyRenewals: number;
   pyRenewals: number;
   renewalGrowthPct: number;
+  commissionPct: number; // Added for commission tracking
   commissionEarned: number;
   finalPayout: number;
   channel: string;

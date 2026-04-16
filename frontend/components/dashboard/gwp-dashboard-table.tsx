@@ -1,21 +1,59 @@
 "use client";
 
 import * as React from "react";
-import { Download, Filter, Search } from "lucide-react";
+import { Download, Filter, Search, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { GwpProductRow } from "@/lib/mock-api/gwp-types";
 
-function GrowthBadge({ value }: { value: number }) {
+function GrowthIndicator({ value }: { value: number }) {
   const isPositive = value >= 0;
   return (
-    <span className={cn(
-      "inline-flex items-center gap-0.5 text-xs font-semibold tabular-nums",
-      isPositive ? "text-emerald-400" : "text-red-400"
+    <div className={cn(
+      "flex flex-col items-end gap-0",
+      isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
     )}>
-      {isPositive ? "▲" : "▼"}{Math.abs(value).toFixed(1)}%
-    </span>
+      <span className="text-[10px] font-bold uppercase tracking-tight opacity-70">
+        {isPositive ? "Growth" : "Decline"}
+      </span>
+      <span className="flex items-center gap-0.5 text-xs font-black tabular-nums">
+        {isPositive ? "↑" : "↓"}{Math.abs(value).toFixed(1)}%
+      </span>
+    </div>
+  );
+}
+
+function AchievementBar({ current, target }: { current: number; target: number }) {
+  const pct = (current / target) * 100;
+  const status = pct < 80 ? "critical" : pct < 100 ? "warning" : "success";
+  
+  const barColor = {
+    critical: "bg-rose-500",
+    warning: "bg-amber-500",
+    success: "bg-emerald-500"
+  }[status];
+
+  const textColor = {
+    critical: "text-rose-600 dark:text-rose-400",
+    warning: "text-amber-600 dark:text-amber-400",
+    success: "text-emerald-600 dark:text-emerald-400"
+  }[status];
+
+  return (
+    <div className="flex flex-col gap-1.5 min-w-[100px]">
+      <div className="flex items-center justify-between gap-2">
+        <span className={cn("text-[10px] font-black tabular-nums", textColor)}>
+          {pct.toFixed(0)}%
+        </span>
+        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
+          Achieved
+        </span>
+      </div>
+      <Progress value={Math.min(pct, 100)} className="h-1" indicatorClassName={barColor} />
+    </div>
   );
 }
 
@@ -31,19 +69,47 @@ export function GwpDashboardTable({ data }: { data: GwpProductRow[] }) {
     return rows;
   }, [data, filter, search]);
 
-  const totals = React.useMemo(() => ({
-    cyGwp: filtered.reduce((s, r) => s + r.cyGwp, 0),
-    pyGwp: filtered.reduce((s, r) => s + r.pyGwp, 0),
-    commissionEarned: filtered.reduce((s, r) => s + r.commissionEarned, 0),
-    finalPayout: filtered.reduce((s, r) => s + r.finalPayout, 0),
-    cyRenewals: filtered.reduce((s, r) => s + r.cyRenewals, 0),
-  }), [filtered]);
+  const totals = React.useMemo(() => {
+    const cyGwp = filtered.reduce((s, r) => s + r.cyGwp, 0);
+    const pyGwp = filtered.reduce((s, r) => s + r.pyGwp, 0);
+    const targetOmr = filtered.reduce((s, r) => s + r.targetOmr, 0);
+    const commissionEarned = filtered.reduce((s, r) => s + r.commissionEarned, 0);
+    
+    return {
+      cyGwp,
+      pyGwp,
+      targetOmr,
+      commissionEarned,
+    };
+  }, [filtered]);
 
   const downloadCSV = () => {
-    const headers = ["Channel", "Product", "CY GWP", "PY GWP", "% Growth", "CY Loss Ratio", "Commission", "Final Payout"];
-    const rows = filtered.map((r) => [
-      r.channel, r.product, r.cyGwp, r.pyGwp, r.growthPct, r.cyLossRatio, r.commissionEarned, r.finalPayout,
-    ]);
+    const headers = [
+      "Product", 
+      "Target (OMR)", 
+      "Current GWP (OMR)", 
+      "Previous GWP (OMR)", 
+      "Achievement %", 
+      "Growth %", 
+      "Commission %", 
+      "Commission Earned (OMR)", 
+      "Portfolio Contribution %"
+    ];
+    const rows = filtered.map((r) => {
+      const achievement = (r.cyGwp / r.targetOmr) * 100;
+      const contribution = (r.cyGwp / totals.cyGwp) * 100;
+      return [
+        r.product, 
+        r.targetOmr * 1000, 
+        r.cyGwp * 1000, 
+        r.pyGwp * 1000, 
+        achievement.toFixed(1), 
+        r.growthPct.toFixed(1), 
+        r.commissionPct, 
+        r.commissionEarned, 
+        contribution.toFixed(1)
+      ];
+    });
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -59,8 +125,13 @@ export function GwpDashboardTable({ data }: { data: GwpProductRow[] }) {
       <CardHeader className="pb-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-sm font-black tracking-tight">Product Portfolio Matrix</CardTitle>
-            <CardDescription className="text-xs font-medium">Detailed breakdown of GWP (Million OMR), Loss Ratios, and Renewals across product lines</CardDescription>
+            <CardTitle className="text-sm font-black tracking-tight flex items-center gap-2">
+              <div className="h-4 w-1 bg-primary rounded-full" />
+              Product Performance Matrix
+            </CardTitle>
+            <CardDescription className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider pl-3">
+              Incentive Tracking · Target vs Achievement · Portfolio Distribution
+            </CardDescription>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {/* Search */}
@@ -98,54 +169,114 @@ export function GwpDashboardTable({ data }: { data: GwpProductRow[] }) {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="overflow-x-auto no-scrollbar">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-y border-border bg-muted/40">
-                {["Products", "CY GWP", "PY GWP", "% Growth", "CY Loss Ratio", "PY Loss Ratio", "% Growth", "CY Renewals", "PY Renewals", "% Growth"].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400 whitespace-nowrap">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((row, i) => (
-                <tr
-                  key={row.id}
-                  className={cn(
-                    "group border-b border-border transition-all duration-200 hover:bg-muted/30",
-                    i % 2 === 0 ? "bg-transparent" : "bg-muted/10 dark:bg-muted/5"
-                  )}
-                >
-                  <td className="px-4 py-4 font-black text-blue-700 dark:text-blue-400 whitespace-nowrap text-sm tracking-tight">{row.product}</td>
-                  <td className="px-4 py-4 tabular-nums text-right font-bold">{row.cyGwp.toFixed(1)}</td>
-                  <td className="px-4 py-4 tabular-nums text-right font-bold text-muted-foreground/60">{row.pyGwp.toFixed(1)}</td>
-                  <td className="px-4 py-4 text-center"><GrowthBadge value={row.growthPct} /></td>
-                  <td className="px-4 py-4 tabular-nums text-right font-bold">{row.cyLossRatio.toFixed(1)}%</td>
-                  <td className="px-4 py-4 tabular-nums text-right font-bold text-muted-foreground/60">{row.pyLossRatio.toFixed(1)}%</td>
-                  <td className="px-4 py-4 text-center"><GrowthBadge value={row.lossRatioGrowthPct} /></td>
-                  <td className="px-4 py-4 tabular-nums text-right font-bold">{row.cyRenewals.toLocaleString()}</td>
-                  <td className="px-4 py-4 tabular-nums text-right font-bold text-muted-foreground/60">{row.pyRenewals.toLocaleString()}</td>
-                  <td className="px-4 py-4 text-center"><GrowthBadge value={row.renewalGrowthPct} /></td>
+        <TooltipProvider>
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-y border-border bg-muted/40">
+                  <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-primary whitespace-nowrap">Product Portfolio</th>
+                  <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">Target (OMR)</th>
+                  <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">Current GWP</th>
+                  <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">Prev. GWP</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-primary whitespace-nowrap">Achievement %</th>
+                  <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-primary whitespace-nowrap">Growth %</th>
+                  <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-primary whitespace-nowrap">Comm. %</th>
+                  <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-primary whitespace-nowrap">Earnings (OMR)</th>
+                  <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-orange-600 whitespace-nowrap">Portfolio %</th>
                 </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="border-t-2 border-orange-500/30 bg-orange-600/5 dark:bg-orange-500/5">
-                <td className="px-4 py-3 font-black text-orange-700 dark:text-orange-400 uppercase tracking-widest text-xs">Total Aggregate</td>
-                <td className="px-4 py-3 tabular-nums text-right font-black text-foreground">{totals.cyGwp.toFixed(1)}</td>
-                <td className="px-4 py-3 tabular-nums text-right font-black text-muted-foreground/60">{totals.pyGwp.toFixed(1)}</td>
-                <td className="px-4 py-3 text-center">
-                  <GrowthBadge value={totals.pyGwp ? ((totals.cyGwp - totals.pyGwp) / totals.pyGwp) * 100 : 0} />
-                </td>
-                <td colSpan={3} />
-                <td className="px-4 py-3 tabular-nums text-right font-black text-foreground">{totals.cyRenewals.toLocaleString()}</td>
-                <td colSpan={2} />
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filtered.map((row, i) => {
+                  const achievement = (row.cyGwp / row.targetOmr) * 100;
+                  const contribution = (row.cyGwp / totals.cyGwp) * 100;
+                  const diff = row.cyGwp - row.targetOmr;
+                  const isExceeded = diff > 0;
+
+                  return (
+                    <tr
+                      key={row.id}
+                      className={cn(
+                        "group border-b border-border transition-all duration-200 hover:bg-muted/30",
+                        i % 2 === 0 ? "bg-transparent" : "bg-muted/5 dark:bg-muted/5"
+                      )}
+                    >
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-black text-blue-700 dark:text-blue-400 text-sm tracking-tight">{row.product}</span>
+                          <span className="text-[10px] font-bold text-muted-foreground/60">{row.channel} Channel</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 tabular-nums text-right font-bold">{(row.targetOmr / 1000).toFixed(2)}M</td>
+                      <td className="px-4 py-4 tabular-nums text-right font-black text-foreground">{(row.cyGwp / 1000).toFixed(2)}M</td>
+                      <td className="px-4 py-4 tabular-nums text-right font-bold text-muted-foreground/50">{(row.pyGwp / 1000).toFixed(2)}M</td>
+                      <td className="px-4 py-4">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help">
+                              <AchievementBar current={row.cyGwp} target={row.targetOmr} />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-popover border-border p-3 shadow-xl">
+                            <div className="space-y-1">
+                              <p className="text-[11px] font-bold">{row.product}</p>
+                              <p className={cn(
+                                "text-xs font-black",
+                                isExceeded ? "text-emerald-500" : "text-rose-500"
+                              )}>
+                                {isExceeded 
+                                  ? `Target exceeded by OMR ${(diff * 1000).toLocaleString()}`
+                                  : `Shortfall of OMR ${(Math.abs(diff) * 1000).toLocaleString()}`
+                                }
+                              </p>
+                              <p className="text-[10px] text-muted-foreground font-medium">
+                                Target: OMR {(row.targetOmr * 1000).toLocaleString()}
+                              </p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </td>
+                      <td className="px-4 py-4">
+                        <GrowthIndicator value={row.growthPct} />
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex justify-center">
+                          <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-black text-[10px] ring-1 ring-inset ring-blue-500/20">
+                            {row.commissionPct}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 tabular-nums text-right font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+                        {row.commissionEarned.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-4 tabular-nums text-right font-bold text-orange-600/80">
+                        {contribution.toFixed(1)}%
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-primary/20 bg-primary/5 dark:bg-primary/5 shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]">
+                  <td className="px-4 py-5 font-black text-primary uppercase tracking-widest text-[11px]">Aggregate Summary</td>
+                  <td className="px-4 py-5 tabular-nums text-right font-black text-muted-foreground/70">{(totals.targetOmr / 1000).toFixed(2)}M</td>
+                  <td className="px-4 py-5 tabular-nums text-right font-black text-primary">{(totals.cyGwp / 1000).toFixed(2)}M</td>
+                  <td className="px-4 py-5 tabular-nums text-right font-bold text-muted-foreground/40">{(totals.pyGwp / 1000).toFixed(2)}M</td>
+                  <td className="px-4 py-5">
+                    <AchievementBar current={totals.cyGwp} target={totals.targetOmr} />
+                  </td>
+                  <td className="px-4 py-5">
+                    <GrowthIndicator value={totals.pyGwp ? ((totals.cyGwp - totals.pyGwp) / totals.pyGwp) * 100 : 0} />
+                  </td>
+                  <td className="px-4 py-5" />
+                  <td className="px-4 py-5 tabular-nums text-right font-black text-emerald-600 dark:text-emerald-400 text-base">
+                    {totals.commissionEarned.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-5 tabular-nums text-right font-black text-orange-600">100%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </TooltipProvider>
       </CardContent>
     </Card>
   );

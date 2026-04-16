@@ -81,6 +81,7 @@ export const mockGwpKpis: GwpKpi[] = [
 export const mockGwpProducts: GwpProductRow[] = [
   {
     id: "gp-1", product: "Motor Comprehensive", cyGwp: 3250, pyGwp: 2860,
+    targetOmr: 3000, commissionPct: 6,
     growthPct: 13.6, cyLossRatio: 62.5, pyLossRatio: 65.0,
     lossRatioGrowthPct: -3.8, cyRenewals: 8450, pyRenewals: 7800,
     renewalGrowthPct: 8.3, commissionEarned: 195000, finalPayout: 48750,
@@ -92,6 +93,7 @@ export const mockGwpProducts: GwpProductRow[] = [
   },
   {
     id: "gp-2", product: "Medical Group", cyGwp: 2180, pyGwp: 2012,
+    targetOmr: 2500, commissionPct: 4,
     growthPct: 8.3, cyLossRatio: 58.2, pyLossRatio: 60.0,
     lossRatioGrowthPct: -3.0, cyRenewals: 6720, pyRenewals: 6200,
     renewalGrowthPct: 8.4, commissionEarned: 130800, finalPayout: 32700,
@@ -103,6 +105,7 @@ export const mockGwpProducts: GwpProductRow[] = [
   },
   {
     id: "gp-3", product: "Marine Hull", cyGwp: 1820, pyGwp: 1652,
+    targetOmr: 1800, commissionPct: 8,
     growthPct: 10.2, cyLossRatio: 66.8, pyLossRatio: 68.5,
     lossRatioGrowthPct: -2.5, cyRenewals: 9150, pyRenewals: 8600,
     renewalGrowthPct: 6.4, commissionEarned: 109200, finalPayout: 27300,
@@ -114,6 +117,7 @@ export const mockGwpProducts: GwpProductRow[] = [
   },
   {
     id: "gp-4", product: "Property All Risk", cyGwp: 1560, pyGwp: 1430,
+    targetOmr: 1600, commissionPct: 5,
     growthPct: 9.1, cyLossRatio: 55.4, pyLossRatio: 57.0,
     lossRatioGrowthPct: -2.8, cyRenewals: 5200, pyRenewals: 4900,
     renewalGrowthPct: 6.1, commissionEarned: 93600, finalPayout: 23400,
@@ -125,6 +129,7 @@ export const mockGwpProducts: GwpProductRow[] = [
   },
   {
     id: "gp-5", product: "Engineering", cyGwp: 1420, pyGwp: 1286,
+    targetOmr: 1500, commissionPct: 7,
     growthPct: 10.4, cyLossRatio: 69.2, pyLossRatio: 71.5,
     lossRatioGrowthPct: -3.2, cyRenewals: 11400, pyRenewals: 10700,
     renewalGrowthPct: 6.5, commissionEarned: 85200, finalPayout: 21300,
@@ -136,6 +141,7 @@ export const mockGwpProducts: GwpProductRow[] = [
   },
   {
     id: "gp-6", product: "Liability", cyGwp: 980, pyGwp: 902,
+    targetOmr: 1000, commissionPct: 5,
     growthPct: 8.6, cyLossRatio: 61.0, pyLossRatio: 63.5,
     lossRatioGrowthPct: -3.9, cyRenewals: 7300, pyRenewals: 6850,
     renewalGrowthPct: 6.6, commissionEarned: 58800, finalPayout: 14700,
@@ -147,6 +153,7 @@ export const mockGwpProducts: GwpProductRow[] = [
   },
   {
     id: "gp-7", product: "Travel", cyGwp: 850, pyGwp: 787,
+    targetOmr: 800, commissionPct: 12,
     growthPct: 8.0, cyLossRatio: 59.6, pyLossRatio: 61.2,
     lossRatioGrowthPct: -2.6, cyRenewals: 6480, pyRenewals: 6050,
     renewalGrowthPct: 7.1, commissionEarned: 51000, finalPayout: 12750,
@@ -158,6 +165,7 @@ export const mockGwpProducts: GwpProductRow[] = [
   },
   {
     id: "gp-8", product: "Cargo", cyGwp: 790, pyGwp: 733,
+    targetOmr: 1100, commissionPct: 10,
     growthPct: 7.8, cyLossRatio: 72.5, pyLossRatio: 74.0,
     lossRatioGrowthPct: -2.0, cyRenewals: 13250, pyRenewals: 12600,
     renewalGrowthPct: 5.2, commissionEarned: 47400, finalPayout: 11850,
