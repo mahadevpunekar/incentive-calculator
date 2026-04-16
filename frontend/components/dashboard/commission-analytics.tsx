@@ -50,11 +50,18 @@ export function CommissionAnalytics({ products }: { products: GwpProductRow[] })
   );
 
   const channelData = React.useMemo(() => {
-    const map: Record<string, number> = {};
-    products.forEach((p) => { map[p.channel] = (map[p.channel] || 0) + p.commissionEarned; });
-    return Object.entries(map).map(([name, value], i) => ({
+    const map: Record<string, { commission: number; gwp: number }> = {};
+    products.forEach((p) => {
+      if (!map[p.channel]) {
+        map[p.channel] = { commission: 0, gwp: 0 };
+      }
+      map[p.channel].commission += p.commissionEarned;
+      map[p.channel].gwp += p.cyGwp;
+    });
+    return Object.entries(map).map(([name, data], i) => ({
       name,
-      value: value / 1000,
+      commission: data.commission / 1000,
+      gwp: data.gwp, // GWP is already in thousands/units based on mock data consistency
       color: COLORS[i % COLORS.length],
     }));
   }, [products]);
@@ -155,10 +162,25 @@ export function CommissionAnalytics({ products }: { products: GwpProductRow[] })
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "currentColor" }} className="text-muted-foreground" tickLine={false} axisLine={false} width={100} />
                   <Tooltip
                     cursor={{ fill: "currentColor", opacity: 0.05 }}
-                    contentStyle={{ borderRadius: 8, border: "1px solid hsl(var(--border))", background: "hsl(var(--popover))", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
-                    formatter={(v: number) => [`${v.toFixed(1)}K OMR`, "Commission"]}
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.[0]) return null;
+                      const d = payload[0].payload;
+                      return (
+                        <div className="rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-1.5 min-w-[140px]">
+                          <p className="font-bold text-foreground mb-1 border-b border-border pb-1 uppercase tracking-tight">{d.name} Channel</p>
+                          <div className="flex items-center justify-between gap-4">
+                            <span className="text-muted-foreground">Commission</span>
+                            <span className="font-mono font-bold text-emerald-600">{d.commission.toFixed(1)}K</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-4">
+                            <span className="text-muted-foreground">GWP</span>
+                            <span className="font-mono font-bold text-foreground">{(d.gwp / 1).toFixed(0)}K</span>
+                          </div>
+                        </div>
+                      );
+                    }}
                   />
-                  <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={32}>
+                  <Bar dataKey="commission" radius={[0, 6, 6, 0]} maxBarSize={32}>
                     {channelData.map((d, i) => (
                       <Cell key={i} fill={d.color} fillOpacity={0.8} />
                     ))}

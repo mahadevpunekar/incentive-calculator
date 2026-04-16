@@ -19,6 +19,7 @@ import {
   mockGwpProducts,
   mockRegionGwp,
   mockBranchGwp,
+  mockStaffGwp,
   mockIncentiveSlabs,
   mockAiInsights,
 } from "@/lib/mock-api/gwp-data";
@@ -255,9 +256,9 @@ export default function DashboardPage() {
         {/* Section 5: Geographic Visualization */}
         <section id="geography" className="scroll-mt-40 space-y-4">
           <h2 className="text-sm font-black uppercase tracking-widest text-foreground/80 border-l-4 border-teal-600 pl-4">
-            Regional Penetration
+            Regional Provision
           </h2>
-          <OmanGeoMap regions={mockRegionGwp} branches={mockBranchGwp} />
+          <OmanGeoMap regions={mockRegionGwp} branches={mockBranchGwp} staff={mockStaffGwp} />
         </section>
 
         {/* Section 6: Extrapolation Simulator */}

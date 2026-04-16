@@ -87,7 +87,7 @@ export function GwpKpiCard({ kpi }: { kpi: GwpKpi }) {
              <MiniSparkline data={kpi.sparkline} color={cfg.accent} />
           </div>
           <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 text-right leading-tight truncate">
-            6-Month<br/>Variance
+            6-Month<br/>Trend
           </span>
         </div>
       </div>

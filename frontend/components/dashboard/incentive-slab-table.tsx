@@ -69,7 +69,7 @@ function SlabBar({ pct, label }: { pct: number; label: string }) {
 }
 
 export function IncentiveSlabTable({ data }: { data: IncentiveSlabRow[] }) {
-  const [sortKey, setSortKey] = React.useState<"overall" | "motor" | "nonmotor" | "incentive">("overall");
+  const [sortKey, setSortKey] = React.useState<"overall" | "motor" | "nonmotor" | "incentive" | "target">("overall");
   const [sortDir, setSortDir] = React.useState<"asc" | "desc">("desc");
 
   const sorted = React.useMemo(() => {
@@ -80,6 +80,7 @@ export function IncentiveSlabTable({ data }: { data: IncentiveSlabRow[] }) {
         case "motor": va = a.motorAchievedPct; vb = b.motorAchievedPct; break;
         case "nonmotor": va = a.nonMotorAchievedPct; vb = b.nonMotorAchievedPct; break;
         case "incentive": va = a.finalIncentiveOmr; vb = b.finalIncentiveOmr; break;
+        case "target": va = a.motorTarget + a.nonMotorTarget; vb = b.motorTarget + b.nonMotorTarget; break;
         default: va = a.overallAchievedPct; vb = b.overallAchievedPct;
       }
       return sortDir === "desc" ? vb - va : va - vb;
@@ -92,14 +93,14 @@ export function IncentiveSlabTable({ data }: { data: IncentiveSlabRow[] }) {
     else { setSortKey(key); setSortDir("desc"); }
   };
 
-  const SortHeader = ({ label, key }: { label: string; key: typeof sortKey }) => (
+  const SortHeader = ({ label, sortId }: { label: string; sortId: typeof sortKey }) => (
     <th
       className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400 cursor-pointer hover:bg-orange-500/5 select-none transition-all"
-      onClick={() => toggleSort(key)}
+      onClick={() => toggleSort(sortId)}
     >
       <span className="flex items-center gap-1.5">
         {label}
-        {sortKey === key && <span className="text-[10px]">{sortDir === "desc" ? "▼" : "▲"}</span>}
+        {sortKey === sortId && <span className="text-[10px]">{sortDir === "desc" ? "▼" : "▲"}</span>}
       </span>
     </th>
   );
@@ -132,11 +133,12 @@ export function IncentiveSlabTable({ data }: { data: IncentiveSlabRow[] }) {
             <thead>
               <tr className="border-y border-border bg-muted/40">
                 <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">Staff Agent</th>
-                <SortHeader label="Motor" key="motor" />
-                <SortHeader label="Non-Motor" key="nonmotor" />
-                <SortHeader label="Execution" key="overall" />
+                <SortHeader label="Target" sortId="target" />
+                <SortHeader label="Motor" sortId="motor" />
+                <SortHeader label="Non-Motor" sortId="nonmotor" />
+                <SortHeader label="Execution" sortId="overall" />
                 <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">Yield Slab</th>
-                <SortHeader label="Incentive" key="incentive" />
+                <SortHeader label="Incentive" sortId="incentive" />
               </tr>
             </thead>
             <tbody>
@@ -154,6 +156,31 @@ export function IncentiveSlabTable({ data }: { data: IncentiveSlabRow[] }) {
                       <div>
                         <p className="font-black text-sm tracking-tight">{row.staffName}</p>
                         <p className="text-[10px] text-muted-foreground font-mono font-bold">{row.staffId}</p>
+                      </div>
+                    </td>
+                    <td className={cn(
+                      "px-6 py-4 min-w-[180px] transition-colors",
+                      sortKey === "target" ? "bg-orange-500/[0.03]" : ""
+                    )}>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Motor</span>
+                          <span className="text-[13px] font-black tabular-nums text-foreground">
+                            {row.motorTarget.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Non-Motor</span>
+                          <span className="text-[13px] font-black tabular-nums text-foreground">
+                            {row.nonMotorTarget.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="border-t border-orange-500/10 pt-2 flex items-center justify-between">
+                          <span className="text-[9px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">Total</span>
+                          <span className="text-[13px] font-black tabular-nums text-orange-600 dark:text-orange-400">
+                            {(row.motorTarget + row.nonMotorTarget).toLocaleString()}
+                          </span>
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-4 min-w-[120px]">

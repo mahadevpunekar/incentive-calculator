@@ -33,6 +33,7 @@ export type GwpProductRow = {
   finalPayout: number;
   channel: string;
   slice: DataSliceDimensions;
+  monthlyTrend: { month: string; gwp: number }[];
 };
 
 /* ── 3. Region data for Oman map ───────────── */
@@ -48,23 +49,30 @@ export type OmanRegion =
 
 export type RegionGwpRow = {
   region: OmanRegion;
+  target: number;
   cyGwp: number;
   growthPct: number;
-  cyLossRatio: number;
-  lossRatioGrowthPct: number;
-  cyRenewals: number;
-  renewalGrowthPct: number;
 };
 
 export type BranchGwpRow = {
   branch: string;
   region: OmanRegion;
+  target: number;
   cyGwp: number;
   growthPct: number;
-  cyLossRatio: number;
-  lossRatioGrowthPct: number;
-  cyRenewals: number;
-  renewalGrowthPct: number;
+  trend: number[]; // last 6 months GWP
+};
+
+export type StaffGwpRow = {
+  id: string;
+  staffName: string;
+  staffId: string;
+  branch: string;
+  region: OmanRegion;
+  target: number;
+  cyGwp: number;
+  growthPct: number;
+  trend: number[]; // last 6 months GWP
 };
 
 /* ── 4. Incentive staff slabs ──────────────── */
