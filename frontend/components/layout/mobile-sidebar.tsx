@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import { navSections, type NavItem } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { useUiStore } from "@/stores/ui-store";
 
 function isItemActive(pathname: string, href: string) {
   return (
@@ -42,25 +43,14 @@ export function MobileSidebar({
 }) {
   const pathname = usePathname();
 
-  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>(
-    () =>
-      Object.fromEntries(navSections.map((s) => [s.id, true])) as Record<
-        string,
-        boolean
-      >
-  );
+  const [mounted, setMounted] = React.useState(false);
+  const openSections = useUiStore((s) => s.openSections);
+  const setSectionOpen = useUiStore((s) => s.setSectionOpen);
 
   React.useEffect(() => {
-    setOpenSections((prev) => {
-      const next = { ...prev };
-      for (const section of navSections) {
-        if (sectionHasActive(pathname, section.items)) {
-          next[section.id] = true;
-        }
-      }
-      return next;
-    });
-  }, [pathname]);
+    setMounted(true);
+  }, []);
+
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -81,10 +71,8 @@ export function MobileSidebar({
             {navSections.map((section) => (
               <Collapsible
                 key={section.id}
-                open={openSections[section.id] ?? true}
-                onOpenChange={(next) =>
-                  setOpenSections((prev) => ({ ...prev, [section.id]: next }))
-                }
+                open={mounted ? (openSections[section.id] ?? false) : false}
+                onOpenChange={(next) => setSectionOpen(section.id, next)}
                 className="group/coll"
               >
                 <CollapsibleTrigger

@@ -34,25 +34,13 @@ export function AppSidebar({ className }: { className?: string }) {
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
 
-  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>(
-    () =>
-      Object.fromEntries(navSections.map((s) => [s.id, true])) as Record<
-        string,
-        boolean
-      >
-  );
+  const [mounted, setMounted] = React.useState(false);
+  const openSections = useUiStore((s) => s.openSections);
+  const setSectionOpen = useUiStore((s) => s.setSectionOpen);
 
   React.useEffect(() => {
-    setOpenSections((prev) => {
-      const next = { ...prev };
-      for (const section of navSections) {
-        if (sectionHasActive(pathname, section.items)) {
-          next[section.id] = true;
-        }
-      }
-      return next;
-    });
-  }, [pathname]);
+    setMounted(true);
+  }, []);
 
   const renderNavLink = (item: NavItem) => {
     const active = isItemActive(pathname, item.href);
@@ -187,10 +175,8 @@ export function AppSidebar({ className }: { className?: string }) {
             {navSections.map((section) => (
               <Collapsible
                 key={section.id}
-                open={openSections[section.id] ?? true}
-                onOpenChange={(open) =>
-                  setOpenSections((prev) => ({ ...prev, [section.id]: open }))
-                }
+                open={mounted ? (openSections[section.id] ?? false) : false}
+                onOpenChange={(open) => setSectionOpen(section.id, open)}
                 className="group/coll"
               >
                 <CollapsibleTrigger
