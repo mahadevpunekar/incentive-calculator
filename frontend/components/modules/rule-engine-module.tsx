@@ -269,6 +269,7 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
                 <TableHead className="text-xs">Pri</TableHead>
                 <TableHead className="text-xs">Rule</TableHead>
                 <TableHead className="text-xs">Logic & Stacking</TableHead>
+                <TableHead className="text-xs">Target (OMR)</TableHead>
                 <TableHead className="text-xs">Total Incentive</TableHead>
                 <TableHead className="text-xs">Status</TableHead>
                 <TableHead className="w-[90px] text-xs" />
@@ -279,6 +280,7 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
                 .sort((a, b) => a.priority - b.priority)
                 .map((r) => {
                   const totalIncentive = r.conditions.reduce((s, c) => s + (c.incentivePercent || 0), 0);
+                  const totalTarget = r.conditions.reduce((s, c) => s + (c.targetOmr || 0), 0);
                   return (
                     <TableRow key={r.id}>
                       <TableCell className="tabular-nums text-xs">
@@ -287,6 +289,9 @@ export function RuleEngineModule({ initial }: { initial: RuleEngineRule[] }) {
                       <TableCell className="text-xs font-medium">{r.name}</TableCell>
                       <TableCell className="max-w-[400px] text-[11px]">
                         {r.conditions.map((c, i) => formatConditionLine(c, i))}
+                      </TableCell>
+                      <TableCell className="tabular-nums text-xs font-black text-blue-600 dark:text-blue-400">
+                        {totalTarget >= 1000 ? (totalTarget / 1000).toLocaleString() + "K" : totalTarget.toLocaleString()}
                       </TableCell>
                       <TableCell className="tabular-nums text-xs font-medium">
                         +{totalIncentive.toFixed(2)}%

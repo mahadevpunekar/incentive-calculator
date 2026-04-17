@@ -136,8 +136,7 @@ export function IncentiveSlabTable({ data }: { data: IncentiveSlabRow[] }) {
                 <SortHeader label="Target" sortId="target" />
                 <SortHeader label="Motor" sortId="motor" />
                 <SortHeader label="Non-Motor" sortId="nonmotor" />
-                <SortHeader label="Execution" sortId="overall" />
-                <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400">Yield Slab</th>
+                <SortHeader label="% Achieved" sortId="overall" />
                 <SortHeader label="Incentive" sortId="incentive" />
               </tr>
             </thead>
@@ -192,14 +191,7 @@ export function IncentiveSlabTable({ data }: { data: IncentiveSlabRow[] }) {
                     <td className="px-4 py-4">
                       <ProgressRing pct={row.overallAchievedPct} />
                     </td>
-                    <td className="px-4 py-4">
-                      <span className={cn(
-                        "inline-flex items-center rounded px-2 py-0.5 text-[10px] font-black tracking-tight border",
-                        slabCfg.text, "border-current bg-background shadow-sm"
-                      )}>
-                        {row.appliedSlab} · {row.incentivePct}%
-                      </span>
-                    </td>
+
                     <td className="px-4 py-4">
                       <p className={cn("text-base font-black tabular-nums tracking-tighter", row.finalIncentiveOmr > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-500")}>
                         {row.finalIncentiveOmr > 0 ? `OMR ${row.finalIncentiveOmr.toLocaleString()}` : "NO PAYOUT"}
